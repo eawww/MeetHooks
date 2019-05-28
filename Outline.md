@@ -179,12 +179,35 @@ const AlienSpacecraft = () => {
 
 In the above example, the alien spacecraft will imperitively abduct some loony from earth *after* every render and do science on them. Importantly, because of the returned callback, the alien spacecraft will return the previous loony before abducting another one. This behavior is very important to ensuring you never have two of the same subscriptions or that you undo mutations to the DOM before repeating them.
 
-I casually mentioned just now that the effect occurs *after* each render. By that, I mean that React only runs an effect after its render's changes successful, are flushed to the DOM, and are those changes are painted. Importantly, it is guaranteed to fire before any subsequent renders.
+I casually mentioned just now that the effect occurs *after* each render. By that, I mean that React only runs an effect after its render's changes are successful, are flushed to the DOM, and those changes are painted. Importantly, it is guaranteed to fire before any subsequent renders.
 There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders.
 
 It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect.
 
 #### useRef( )
+
+`useRef` provides a way to maintain a mutable value that persists for the lifetime of the component independent of the render cycle.
+
+> ❗️This isn't a really good example
+```jsx
+const Watchmen = () => {
+  const doctorManhattan = useRef(`
+    I prefer the stillness here.
+    I am tired of Component.
+    These renders.
+    I am tired of being caught in the tangle of their lives.
+  `)
+  return <Osterman ref={doctoManhattan}>"Bean Juice. Human Bean Juice."</p>
+}
+```
+
+It's most commonly used to keep a reference to a DOM element, but can be used to keep any value around, much in the same way that an instance variable would stick around. The value lives in the `current` property of the returned value.
+
+## Making Your Own Reusable Hooks
+
+## Testing
+
+## Error Handling
 
 # Sources
 
