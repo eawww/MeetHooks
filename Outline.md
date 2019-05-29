@@ -231,9 +231,10 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
     1. Cleanup functions from `useEffect` that need to be rerun are fired synchronously.
     1. Effects from `useEffect` that need to be rerun are fired synchronously.
 1. Unmount, once it is decided that the child must die.
+    1. React updates Virtual DOM
     1. All cleanup functions are called in the order that they're defined. 
-      - (This is how it goes. I don't know if it's important that it does or if it's just an implementation coincidence)
-    1. React updates the Virtual DOM, then 🚽 flushes necessary changes to the DOM.
+        - (This is how it goes. I don't know if it's important that it does or if it's just an implementation coincidence)
+    1. 🚽 Flushes necessary changes to the DOM.
     1. 🎨 Browser Paints changes to the DOM
 
 ![Browser performance graph of event sequnce of functional component unmounting](./images/Example06a.png)
