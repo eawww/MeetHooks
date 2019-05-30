@@ -5,7 +5,7 @@
 
 > **Target Audience:** React developers interested in using react hooks, refining their understanding of the way hooks work, anyone interested in diving into React, or super hardcore React nerds interested in nitpicking a talk about react hooks.
 
-> ⚠️This assumes a basic understanding of JavaScript/HTML fundamentals. Working knowledge of React is recommended but not required for the brave.
+> ⚠️This assumes a basic understanding of JavaScript/HTML fundamentals. Working knowledge of React is recommended but not required for the brave 👩🏽‍🚀.
 
 ### History
 
@@ -17,11 +17,11 @@ The `class` model for writing React components is a long and storied tradition. 
 
 There have been several solutions used to address the problems of classes:
 - *Mixins* offered a handy way to group related logic together and reuse it between components by basically allowing you to define related logic in a function which is then all attached to the class, but...
-  - They had a tendency to introduce interdependent code without making it obvious how or whether it was interdependent. Everything would get all stuck together like when old spaghetti becomes a solid starchy brick.
+  - They had a tendency to introduce interdependent code without making it obvious how or whether it was interdependent. Everything would get all stuck together like how old spaghetti becomes a solid, unscoopable, starchy brick.
   - Related mixins sometimes couldn't even be used together if they both implemented a method with the same name.
   - They made refactoring and building upon large components the stuff of nightmares.
   - They simply did not scale well at all. That's why their use has been actively discouraged for at least the last 3 years.
-- *Render props* and *Higher Order Components* have also been handy tools but they quickly turn a component hierarchy into what is affectionately known as *wrapper hell*. [❗️Stupid fire animation on the slides]
+- *Render props* and *Higher Order Components* have also been handy tools but they quickly turn a component hierarchy into what is affectionately known as *wrapper hell* [❗️Stupid fire animation on the slides plz] called so because a component hierarchies should be an easily consumable view of how an app is organized, but patterns like these make them overwhelming, unpleasant, and nearly useless... a lot like a waiter bringing you the whole pot of spaghetti with the water still in it. Pasta analogies work. 🍜
 
 The most recent and, in my opinion *best* attempt at creating cohesive, reusable statful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
 
@@ -40,20 +40,17 @@ I'll also only be using arrow functions because I need to get my money's worth o
 
 ### Parts of a functional component
 ```jsx
-const definedAsFunction = ({acceptsPropObject}) => <ReturnsJSX />
+const definedAsFunction = ({acceptsPropObject}) => {
+  doStuff();
+  return <ReturnsJSX />
+}
 ```
 A functional React component has three fundamental characteristics.
 - It's defined as a function (that's why they call them *functional*)
 - Accepts a `props` object as an argument
 - Returns JSX which is a syntax extension to JavaScript but you can think of it conceptually as magic HTML that *lives* in JavaScript.
 
-Furthermore, just like any function, a functional component can do stuff before it returns a value:
-```jsx
-const definedAsFunction = ({acceptsPropObject}) => {
-  doStuff();
-  return <ReturnsJSX />
-}
-```
+Furthermore, just like any function, a functional component can do stuff before it returns a value.
 
 Functions that return JSX can be used as JSX elements in other components. This is some of that composability that everybody loves so much.
 ```jsx
@@ -66,7 +63,7 @@ const definedAsFunction = ({acceptsPropObject}) => {
 }
 ```
 
-> ⚠️Important note for beginners: Javascript expressions can be used in JSX by enclosing them in `{ curly braces }`
+> 👶️Important note for beginners: Javascript expressions are used in JSX by enclosing them in `{ curly braces }`
 
 When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be flushed to the actual DOM to be painted by the browser.
 
@@ -97,16 +94,14 @@ What do you suppose will happen to the UI when the button is clicked?
 
 <details>
   <summary>The answer may surprise you</summary>
-  <p>
-    It's C! C is the answer. <br>
-    The numba value does indeed increment as can be seen in the browser console but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeNumbaGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's numba value is initialized to 0.
-  </p>
+    It's **C**! **C** is the answer.
+    The `numba` value does indeed increment as can be seen in the browser console, but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeNumbaGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's numba value is initialized to 0.
 </details>
 
 ### Some Hooks
 The basic Hooks I want to go over in detail are `useState`, `useEffect`, and `useRef`. [React documentation](https://reactjs.org/docs/hooks-reference.html) lists `useContext` instead of `useRef` as one of the three basic hooks, but I've found `useRef` to be more useful.
 
-In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they actually can have stateful values of their own!
+In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they *actually can* have stateful values of their own!
 
 #### useState( )
 
@@ -173,7 +168,12 @@ Since `setButtonText` enqueues a rerender each time it's called, and it's called
 
 > ❗️This would be a nice place for an audience survey if I can get that to work
 
-If you guessed **C**, you are the furthest from the right answer... which is **E**. The resulting scream will start with E and render once per click. Here's proof and why:
+<details>
+  <summary>Answer here!</summary>
+  If you guessed **C**, you are the furthest from the right answer... which is **E**. The resulting scream will start with E and render once per click.
+</details>
+
+Here's proof and why:
 
 > ❗️Could switch to executing pre-written example
 
@@ -204,14 +204,15 @@ The function called by `useEffect` can also return a cleanup function to be run 
 ```jsx
 const AlienSpacecraft = () => {
   // 🛸
+  const [humanData, setHumanData] = useState([])
   useEffect(() => {
-    const abductee = tractorBeam.abductFrom('🌎', 'Some loony')
-    lights.brightness = 'blinding'
-    probulator.probe(abductee)
-    probulator.probe(abductee)
-    bigAlienJim.smackAroundALittleBit(abductee)
-    probulator.probe(abductee)
-    return () => tractorBeam.returnTo('🌎', abductee)
+    let abductee = tractorBeam.abductFrom('🌎', 'Some loony')
+    lights.brightness = lightModes.BLINDING
+    setHumanData(probulator.doScienceOn(abductee))
+    return () => {
+      lights.brightness = lightModes.AMBIENT_MOOD
+      tractorBeam.returnTo('🌎', abductee)
+    }
   })
   // ...
 }
@@ -281,11 +282,10 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 - It's annoying/difficult/occasionally impossible to re-use stateful logic between components.
   - Complex components can be ludicrously difficult understand just by reading the code.
     - Component lifecycle methods usually contain messes of unrelated code with actually related code in other lifecycle methods and it's hard to break them apart.
-      - ⁉️This implies that unrelated effects with the same dependencies should be broken into separate hooks. Does that have any implications to performace?
-  - Classes are confusing and weird in JavaScript (for people and [machines?])
+  - Classes are confusing and weird in JavaScript (for people and machines)
     - They work differently than in other languages, creating an additional barrier to entry.
-    - ⁉️Why are they confusing for machines? Maybe check Dan's talk
-      -  They're hard to minify. Instance methods will frequently be unminified and unused methods often end up in compiled code.
+    - They encourage pasta-like patterns.
+    -  They're hard to minify. Instance methods will frequently be unminified and unused methods often end up in compiled code.
       - This was in Sophie Alpert's portion of the talk.
   - Reliance on HOCs can lead to "wrapper hell" which makes your component hierarchy tedious and unwieldy.
 
@@ -305,10 +305,12 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 
 ## Error Handling
 
-# Sources
+# Re:Sources
 
-- [Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
-
-https://reactjs.org/docs/hooks-intro.html#motivation
-https://overreacted.io/a-complete-guide-to-useeffect/
-https://www.freecodecamp.org/news/why-react-hooks-and-how-did-we-even-get-here-aa5ed5dc96af/
+- [📄React documentation](https://reactjs.org/docs/hooks-reference.html)
+- [📺 Sophie Alpert, Dan Abramov, and Ryan Florence - React Today and Tomorrow and 90% Cleaner React With Hooks (Video)](https://www.youtube.com/watch?v=dpw9EHDh2bM)
+- [📝Dan Abramov - Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+- [📄React Docs - Hooks Intro: Motivation](https://reactjs.org/docs/hooks-intro.html#motivation)
+- [📝Dan Abramov - A Complete Guide to useEffect](https://overreacted.io/a-complete-guide-to-useeffect/)
+- [📝Ryan Yurkanin - Why React Hooks, and how did we even get here?](https://www.freecodecamp.org/news/why-react-hooks-and-how-did-we-even-get-here-aa5ed5dc96af/)
+- [📄 React documentation - Reconciliation](https://reactjs.org/docs/reconciliation.html)
