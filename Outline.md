@@ -25,7 +25,7 @@ There have been several solutions used to address the problems of classes:
 
 The most recent and, in my opinion *best* attempt at creating cohesive, reusable statful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
 
-Hooks are still new so bugs, best practices, and support from some third party libraries are still being worked out but, since their release, Hooks have become incredibly popular and have lived up to the hype. There's already countless blog posts, instructional videos,and talks on the subject but *this* is the only one at Cerner DevCon KC 2019. Seriously, though, there's truckloads of really smart people out there giving away knowledge for free and the official React documentation is great as well. I'll be sure to make my sources available to everyone at the end.
+Hooks are still new so little bugs, best practices, and support from some third party libraries are still being worked out. Despite this, since their release, Hooks have become incredibly popular and have lived up to the hype. There's already countless blog posts, instructional videos,and talks on the subject but *this* is the only one at Cerner DevCon KC 2019. Seriously, though, there's truckloads of really smart people out there giving away knowledge for free and the official React documentation is great as well. I'll be sure to make my sources available to everyone at the end.
 
 Anyway, let's meet some hooks and find out what all the fuss is about...
 
@@ -34,6 +34,7 @@ Anyway, let's meet some hooks and find out what all the fuss is about...
 Let's lay down some groundwork to make sure everyone's on the same page, and then go over some of the most useful hooks in detail.
 
 ## Basics of Functional Components
+
 Since this talk is meant to be accessible to React beginners, I'd like to spend a few minutes talking about how functional components work in React. I won't be talking about class components because *where we're going, we don't need classes.*
 I'll also only be using arrow functions because I need to get my money's worth on deez ligatures. Also I like them.
 
@@ -54,7 +55,7 @@ const definedAsFunction = ({acceptsPropObject}) => {
 }
 ```
 
-Functions that return JSX can be used as JSX elements in other components.
+Functions that return JSX can be used as JSX elements in other components. This is some of that composability that everybody loves so much.
 ```jsx
 const AnotherComponent = () => <span>I'm super neat</span>
 const definedAsFunction = ({acceptsPropObject}) => {
@@ -67,22 +68,56 @@ const definedAsFunction = ({acceptsPropObject}) => {
 
 > ⚠️Important note for beginners: Javascript expressions can be used in JSX by enclosing them in `{ curly braces }`
 
-When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. This can be optimized with `React.memo()` but that's not important right now. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be flushed to the actual DOM to be painted by the browser. The juicy part of this is that the re-render on the virtual DOM is way less computationally expensive than a similar operation on the actual DOM.
+When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be flushed to the actual DOM to be painted by the browser.
 
 > ❗️A diagram would be nice here.
 
+Consider the following functional component:
+```jsx
+// Example00.js
+const LifeWithoutHooks = () => {
+  console.log("Render")
+  let numba = 0
+  const makeNumbaGoUp = () => {
+    numba += 1
+    console.log(`Numba was incremented to ${numba}`)
+  }
+  return <button onClick={makeNumbaGoUp} >{numba}</button>
+}
+```
+> This component logs "Render" when it's called, initializes a variable called `numba`, defines a function to increment `numba` and output its value, and returns a button that calls that function on click and displays the value of `numba`
+
+What do you suppose will happen to the UI when the button is clicked?
+
+**A.** The button text increments
+**B.** It triggers a rerender and the button text increments
+**C.** Nothing
+**D.** Catastrophic failure of the app
+**E.** Blockchain
+
+<details>
+  <summary>The answer may surprise you</summary>
+  <p>
+    It's C! C is the answer. <br>
+    The numba value does indeed increment as can be seen in the browser console but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeNumbaGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's numba value is initialized to 0.
+  </p>
+</details>
+
 ### Some Hooks
 The basic Hooks I want to go over in detail are `useState`, `useEffect`, and `useRef`. [React documentation](https://reactjs.org/docs/hooks-reference.html) lists `useContext` instead of `useRef` as one of the three basic hooks, but I've found `useRef` to be more useful.
+
+In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they actually can have stateful values of their own!
 
 #### useState( )
 
 Easily the most important hook is the `useState` hook... which looks like this:
 
 ```jsx
+// Example03.js
 const Highlander = () => {
   const [howManyThereCanBe, setHowManyThereCanBe] = useState(1);
   return <p>
-    {`⚔️"THERE CAN BE ONLY ${howManyThereCanBe}!”️️⚡️`}
+    ⚔️"THERE CAN BE ONLY ${howManyThereCanBe}!”️️⚡️
     <button 
       onClick={() => setHowManyThereCanBe(howManyThereCanBe + 1)}
     >
@@ -94,7 +129,7 @@ const Highlander = () => {
 
 > ⚠️ Let's note early that one constraint of hooks is that they can only be defined in the top level of their function.
 
-This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that the setter is called `set` + the name of the value. Array destructuring is a common pattern for using hooks.
+This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that so that the set function is the name of the value prefixed with the word `set`. Array destructuring is a common pattern for using hooks.
 
 On the initial render, the value of the stateful value is that of whatever is passed as an argument to `useState`. Calling the `set` function enqueues a rerender of the component replacing the stateful value with the new value. If it's the same value, the render will "bail out," meaning that it may re-render itself, but won't rerender deeper into the tree. 
 
