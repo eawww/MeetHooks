@@ -5,41 +5,39 @@
 
 > **Target Audience:** React developers interested in using react hooks, refining their understanding of the way hooks work, anyone interested in diving into React, or super hardcore React nerds interested in nitpicking a talk about react hooks.
 
-> ⚠️This assumes a basic understanding of JavaScript/HTML fundamentals. Working knowledge of React is helpful but not required.
+> ⚠️This assumes a basic understanding of JavaScript/HTML fundamentals. Working knowledge of React is recommended but not required for the brave.
 
-# Intro
+### History
 
-# History/Rationale
-## History
-- On October 25th, 2018, The React team posted [an RFC](https://github.com/reactjs/rfcs/pull/68) called 'RFC: React Hooks #68' which proposed a system for using state, and other features previously exclusive to 'class' components, in functional components. The next day, it was announced at React Conf. After months of enthusiastic feedback from developers, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in react [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
+On October 25th, 2018, The React team posted [an RFC](https://github.com/reactjs/rfcs/pull/68) called 'RFC: React Hooks #68' which proposed a system for using state, and other features previously exclusive to 'class' components, in functional components. The next day, it was announced at React Conf. After months of enthusiastic feedback from developers, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
 
-## Why?
-- It's annoying/difficult/occasionally impossible to re-use stateful logic between components.
-  - Complex components can be ludicrously difficult understand just by reading the code.
-    - Component lifecycle methods usually contain messes of unrelated code with actually related code in other lifecycle methods and it's hard to break them apart.
-      - ⁉️This implies that unrelated effects with the same dependencies should be broken into separate hooks. Does that have any implications to performace?
-  - Classes are confusing and weird in JavaScript (for people and [machines?])
-    - They work differently than in other languages, creating an additional barrier to entry.
-    - ⁉️Why are they confusing for machines? Maybe check Dan's talk
-      -  They're hard to minify. Instance methods will frequently be unminified and unused methods often end up in compiled code.
-      - This was in Sophie Alpert's portion of the talk.
-  - Reliance on HOCs can lead to "wrapper hell" which makes your component hierarchy tedious and unwieldy.
+### History/Rationale
 
-## Benefits
-- Full backward compatibility
-  - While Hooks are recommended for future develpoment in React, there are no plans to discontinue support for class-based components.
-  - Once your probject is on React >=16.8.0, you can begin writing new components using Hooks and they'll get along just fine with your existing class-based components.
-    - *Note: Hooks cannot be used in class based components so a rewrite of a single component can't be done gradually*
-  
-# Meet Hooks
+The `class` model for writing React components is a long and storied tradition. For six years, classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
+
+There have been several solutions used to address the problems of classes:
+- *Mixins* offered a handy way to group related logic together and reuse it between components by basically allowing you to define related logic in a function which is then all attached to the class, but...
+  - They had a tendency to introduce interdependent code without making it obvious how or whether it was interdependent. Everything would get all stuck together like when old spaghetti becomes a solid starchy brick.
+  - Related mixins sometimes couldn't even be used together if they both implemented a method with the same name.
+  - They made refactoring and building upon large components the stuff of nightmares.
+  - They simply did not scale well at all. That's why their use has been actively discouraged for at least the last 3 years.
+- *Render props* and *Higher Order Components* have also been handy tools but they quickly turn a component hierarchy into what is affectionately known as *wrapper hell*. [❗️Stupid fire animation on the slides]
+
+The most recent and, in my opinion *best* attempt at creating cohesive, reusable statful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
+
+Hooks are still new so bugs, best practices, and support from some third party libraries are still being worked out but, since their release, Hooks have become incredibly popular and have lived up to the hype. There's already countless blog posts, instructional videos,and talks on the subject but *this* is the only one at Cerner DevCon KC 2019. Seriously, though, there's truckloads of really smart people out there giving away knowledge for free and the official React documentation is great as well. I'll be sure to make my sources available to everyone at the end.
+
+Anyway, let's meet some hooks and find out what all the fuss is about...
+
+## Meet Hooks
 
 Let's lay down some groundwork to make sure everyone's on the same page, and then go over some of the most useful hooks in detail.
 
 ## Basics of Functional Components
 Since this talk is meant to be accessible to React beginners, I'd like to spend a few minutes talking about how functional components work in React. I won't be talking about class components because *where we're going, we don't need classes.*
-I'll also only be using arrow functions because I need to get my money's worth on deez ligatures.
+I'll also only be using arrow functions because I need to get my money's worth on deez ligatures. Also I like them.
 
-#### Parts of a functional component
+### Parts of a functional component
 ```jsx
 const definedAsFunction = ({acceptsPropObject}) => <ReturnsJSX />
 ```
@@ -230,7 +228,7 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
     1. 🎨 Browser Paints changes to the DOM
     1. Cleanup functions from `useEffect` that need to be rerun are fired synchronously.
     1. Effects from `useEffect` that need to be rerun are fired synchronously.
-1. Unmount, once it is decided that the child must die.
+1. Unmount, once it is decided that the child must die. An interesting thing happens:
     1. React updates Virtual DOM
     1. All cleanup functions are called in the order that they're defined. 
         - (This is how it goes. I don't know if it's important that it does or if it's just an implementation coincidence)
@@ -244,6 +242,24 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
 
 One of the coolest things about Hooks is their composability and reusability. You might frequently find yourself implementing patterns and combinations of hooks in various components. The good news is you don't have to keep rewriting those same patterns anymore! By enclosing related hooks into their own function and returning an array of any relevant values and functions, you've made yourself a hook! As you may have gathered by now, convention is that any hook's name begins with `use`. This is for readability and for enforcing linting rules related to hooks.
 
+## Why?
+- It's annoying/difficult/occasionally impossible to re-use stateful logic between components.
+  - Complex components can be ludicrously difficult understand just by reading the code.
+    - Component lifecycle methods usually contain messes of unrelated code with actually related code in other lifecycle methods and it's hard to break them apart.
+      - ⁉️This implies that unrelated effects with the same dependencies should be broken into separate hooks. Does that have any implications to performace?
+  - Classes are confusing and weird in JavaScript (for people and [machines?])
+    - They work differently than in other languages, creating an additional barrier to entry.
+    - ⁉️Why are they confusing for machines? Maybe check Dan's talk
+      -  They're hard to minify. Instance methods will frequently be unminified and unused methods often end up in compiled code.
+      - This was in Sophie Alpert's portion of the talk.
+  - Reliance on HOCs can lead to "wrapper hell" which makes your component hierarchy tedious and unwieldy.
+
+## Benefits
+- Full backward compatibility
+  - While Hooks are recommended for future develpoment in React, there are no plans to discontinue support for class-based components.
+  - Once your probject is on React >=16.8.0, you can begin writing new components using Hooks and they'll get along just fine with your existing class-based components.
+    - *Note: Hooks cannot be used in class based components so a rewrite of a single component can't be done gradually*
+
 ## Testing
 
 ## Best Practices
@@ -256,5 +272,8 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 
 # Sources
 
+- [Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
+
 https://reactjs.org/docs/hooks-intro.html#motivation
 https://overreacted.io/a-complete-guide-to-useeffect/
+https://www.freecodecamp.org/news/why-react-hooks-and-how-did-we-even-get-here-aa5ed5dc96af/
