@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 
+import LifeWithoutHooks from './Examples/Example00';
 import Thingamabob from './Examples/Example01';
 import Parent from './Examples/Example02';
 import Highlander from './Examples/Example03'
@@ -13,6 +14,7 @@ const App = () => {
   const [lifeSavings, setLifeSavings] = useState(10)
   const toil = () => setLifeSavings(lifeSavings + 1)
   return [
+    <LifeWithoutHooks />,
     // <Thingamabob a="🥄" b="🍴"/>,
     // <hr />,
 
@@ -27,7 +29,7 @@ const App = () => {
     // <hr />,
     
     // <EffectUser />,
-    <EffectUser2 />,
+    // <EffectUser2 />,
   ]
 }
 

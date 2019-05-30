@@ -3,7 +3,7 @@ import '../App.css';
 const Highlander = () => {
   const [howManyThereCanBe, setHowManyThereCanBe] = useState(1);
   return <p>
-    {`⚔️"THERE CAN BE ONLY ${howManyThereCanBe}!"️️⚡️`}
+    ⚔️"THERE CAN BE ONLY ${howManyThereCanBe}!"️️⚡️
     <button 
       onClick={() => setHowManyThereCanBe(howManyThereCanBe + 1)}
     >
