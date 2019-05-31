@@ -7,6 +7,7 @@ import Parent from './Examples/Example02';
 import Highlander from './Examples/Highlander'
 import GraduallyScreamierButton from './Examples/GraduallyScreamierButton'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
+import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
 import EffectUser from './Examples/Example05'
 import EffectUser2 from './Examples/Example06'
 
@@ -19,12 +20,14 @@ const App = () => {
         <Link to="/Highlander">⚡️</Link>
         <Link to="/GraduallyScreamierButton">😱</Link>
         <Link to="/TheEverlastingComponent">🌌</Link>
+        <Link to="/RealExamplesHaveCurds">🧀</Link>
         <hr />
         <Route exact path="/" component={null} />
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
         <Route path="/Highlander" component={Highlander} />
         <Route path="/GraduallyScreamierButton" component={GraduallyScreamierButton} />
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
+        <Route path="/RealExamplesHaveCurds" component={RealExamplesHaveCurds} />
     </Router>
   );
 }

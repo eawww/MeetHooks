@@ -19,6 +19,7 @@ code {
 
 button {
   margin: 1rem;
+  letter-spacing: 0.2em;
   padding: 0.5rem;
   font-size: 2rem;
   font-family: "LAZER84", "VCR OSD Mono";
@@ -34,4 +35,28 @@ a {
 
 hr {
   color: lime;
+}
+
+#highlanderHolder {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  pointer-events: none;
+  text-align: left;
+}
+
+.MacLeod {
+  animation: rise 0.5s forwards;
+  position: absolute;
+  height: 20%;
+}
+
+@keyframes rise {
+  0% {
+    bottom: -20%;
+  }
+  100% {
+    bottom: 0;
+  }
 }

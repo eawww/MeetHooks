@@ -95,7 +95,7 @@ What do you suppose will happen to the UI when the button is clicked?
 </details>
 
 ### Some Hooks
-The basic Hooks I want to go over in detail are `useState`, `useEffect`, and `useRef`. [React documentation](https://reactjs.org/docs/hooks-reference.html) lists `useContext` instead of `useRef` as one of the three basic hooks, but I've found `useRef` to be more useful.
+I won't have time to cover all 10 distinct hooks that are currently part of React's API, but I'll try to cover the one I feel are most valuable to get started with. For each one, I'll explain its purpose, how it works, and show you some common use cases. I've also found that, when working with hooks, it's incredibly valuable to know the order everything executes in. Details of this are a little lacking in the standard documentation so I'll pay special attention to helping you leave with a conceptual understanding of what exactly happens when your hooks-laden components are dancing around on the screen.
 
 In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they *actually can* have stateful values of their own!
 
@@ -178,6 +178,8 @@ After two clicks, our button/console looks like this:
 
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
 
+
+
 #### `useEffect( )`
 
 `useEffect` doesn't return anything. Its purpose is to execute imperitive side-effects in functional components: stuff like data fetching, subscriptions, manual DOM mutation, logging, etc...
@@ -219,7 +221,7 @@ In the above example, the alien spacecraft will imperitively abduct some loony f
 I casually mentioned just now that the effect occurs *after* each render. By that, I mean that React only runs an effect after its render's changes are successful, are flushed to the DOM, and those changes are painted. Importantly, it is guaranteed to fire before any subsequent renders.
 There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders.
 
-It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect.
+It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
 
 #### `useRef( )`
 
@@ -254,7 +256,7 @@ const MacLeod = ({qty}) => {
 ```
 
 But why do we have to append our highlander in a useEffect? <details>
-  <summary>Well, because...</summary> ...on the initial render, our `highlanderHolderRef` is undefined.  
+  <summary>Well, because...</summary> ...on the initial render, our `highlanderHolderRef` is undefined. So when we try to call `appendChild( )` on it, it all comes crashing down.
 </details>
 <br><br>
 ```jsx
