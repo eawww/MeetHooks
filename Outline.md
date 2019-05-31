@@ -31,7 +31,7 @@ Anyway, let's meet some hooks and find out what all the fuss is about...
 
 Let's lay down some groundwork to make sure everyone's on the same page, and then go over some of the most useful hooks in detail.
 
-## Basics of Functional Components
+### Basics of Functional Components
 
 Since this talk is meant to be accessible to React beginners, I'd like to spend a few minutes talking about how functional components work in React. I won't be talking about class components because *where we're going, we don't need classes.*
 I'll also only be using arrow functions because I need to get my money's worth on deez ligatures. Also I like them.
@@ -61,7 +61,7 @@ const definedAsFunction = ({acceptsPropObject}) => {
 }
 ```
 
-> 👶️Important note for beginners: Javascript expressions are used in JSX by enclosing them in `{ curly braces }`
+> 👶️Important note for beginners: JSX is a templating language. Javascript expressions are used in JSX by enclosing them in `{ curly braces }`
 
 When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be flushed to the actual DOM to be painted by the browser.
 
@@ -69,7 +69,7 @@ When a component is rendered or re-rendered, its function is called along with t
 
 Consider the following functional component:
 ```jsx
-// Example00.js
+// LifeWithoutHooks.js
 const LifeWithoutHooks = () => {
   console.log("Render")
   let numba = 0
@@ -101,12 +101,12 @@ The basic Hooks I want to go over in detail are `useState`, `useEffect`, and `us
 
 In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they *actually can* have stateful values of their own!
 
-#### useState( )
+#### `useState( )`
 
 Easily the most important hook is the `useState` hook... which looks like this:
 
 ```jsx
-// Example03.js
+// Highlander.js
 const Highlander = () => {
   const [howManyThereCanBe, setHowManyThereCanBe] = useState(1);
   return <p>
@@ -120,17 +120,14 @@ const Highlander = () => {
 }
 ```
 
-> ⚠️ Let's note early that one constraint of hooks is that they can only be defined in the top level of their function.
-
 This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that so that the set function is the name of the value prefixed with the word `set`. Array destructuring is a common pattern for using hooks.
 
-On the initial render, the value of the stateful value is that of whatever is passed as an argument to `useState`. Calling the `set` function enqueues a rerender of the component replacing the stateful value with the new value. If it's the same value, the render will "bail out," meaning that it may re-render itself, but won't rerender deeper into the tree. 
+On the initial render, the stateful value is that of whatever is passed as an argument to `useState`. Calling the `set` function enqueues a rerender of the component replacing the stateful value with the new value. If it's the same value, the render will "bail out," meaning that it may re-render itself, but won't rerender deeper into the tree. 
 
+❗️Reword this ya crazy
 Since calling the `set` function triggers a rerender, this means the stateful value provided by `useState` is constant for each render. The props and state of any render belong to that render and do not change. If one of those changes, you can be sure it's another render.
 
-A lot like `setState` in class components, updates to `useState` values at around the same time will be grouped together so that they're applied to the same rerender. 
-
-Also a lot like `setState`, the `set` function returned from `useState` can accept a function to update state based on previous state:
+A lot like `setState`, the `set` function returned from `useState` can accept a function to update state based on previous state:
 ```jsx
 const GraduallyScreamierButton = () => {
   const [buttonText, setButtonText] = useState('AH!')
@@ -139,9 +136,12 @@ const GraduallyScreamierButton = () => {
 }
 ```
 
+Also a lot like `setState` in class components, updates to `useState` values at around the same time will be grouped together so that they're applied to the same rerender. 
+
 As an example of how `useState`'s update grouping works, consider the following bit of code:
 
 ```jsx
+// GraduallyScreamierButton.js
 const GraduallyScreamierButton = () => {
   const [buttonText, setButtonText] = useState('AH!')
   const getScreamier = () => {
@@ -180,7 +180,7 @@ After two clicks, our button/console looks like this:
 
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
 
-#### useEffect( )
+#### `useEffect( )`
 
 `useEffect` doesn't return anything. Its purpose is to execute imperitive side-effects in functional components: stuff like data fetching, subscriptions, manual DOM mutation, logging, etc...
 
@@ -223,24 +223,60 @@ There is another hook, `useLayoutEffect` that is identical to `useEffect` but fi
 
 It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect.
 
-#### useRef( )
+#### `useRef( )`
 
 `useRef` provides a way to maintain a mutable value that persists for the lifetime of the component independent of the render cycle.
 
-> ❗️This isn't a really good example
+Like `useState`, `useRef` accepts its initial value as an argument. The important difference it, after that moment, it lives independently of the render cycle and maintains a mutable value in its `.current` property for the entire life of the component.
+
+A very common use for `useRef` is to keep a reference to a DOM element around for imperative access. This is useful for, say, getting the value of an input field, but it's also a delightful escape hatch from React for when you want to make use of more imperative libraries.
+
 ```jsx
-const Watchmen = () => {
-  const doctorManhattan = useRef(`
-    I prefer the stillness here.
-    I am tired of Component.
-    These renders.
-    I am tired of being caught in the tangle of their lives.
-  `)
-  return <Osterman ref={doctoManhattan}>"Bean Juice. Human Bean Juice."</p>
+const SomeFunkyThing = () => {
+  const inputRef = useRef()
+  const wordPrisonRef = useRef()
+  const imprisonWords = () => {
+
+  }
+  return <>
+    <input ref={theRef} />
+    <button>SEIZE THE TEXT!</button>
+    <div>
+      <div ref={wordPrisonRef} id="wordPrison" />
+      <div id="prisonBars" />
+    </div>
+  </>
+}
+```
+
+```jsx
+const TheEverlastingComponent = () => {
+  const [meaninglessValue, setMeaninglessValue] = useState('💀')
+  const renders = useRef(-1)
+  renders.current += 1 // 0 on initial render
+  return <>
+    {renders.current > 0 ?
+      (<p>👋 Hello World!</p>) :
+      (<p>😐 I have lived and died {renders.current} times.</p>)
+    }
+    <button 
+      onClick={() => setMeaninglessValue(Math.random())}
+    >
+      {meaninglessValue}
+    </button>
+  </>
 }
 ```
 
 Its most obvious use is to keep a reference to a DOM element, but it can be used to keep any value around, much in the same way that an instance variable would stick around. The value lives in the `current` property of the returned value.
+
+#### `useContext( )`
+
+#### `useMemo( )`
+
+#### `useCallback( )`
+
+#### `useReducer( )`
 
 ## The order things happen in
 
@@ -278,7 +314,7 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 
 ## Why?
 - It's annoying/difficult/occasionally impossible to re-use stateful logic between components.
-  - Complex components can be ludicrously difficult understand just by reading the code.
+  - Complex components can be ludicrously to difficult understand just by reading the code.
     - Component lifecycle methods usually contain messes of unrelated code with actually related code in other lifecycle methods and it's hard to break them apart.
   - Classes are confusing and weird in JavaScript (for people and machines)
     - They work differently than in other languages, creating an additional barrier to entry.
@@ -295,8 +331,9 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 
 ## Testing
 
-## Best Practices
+## Rules and Best Practices
 
+  - One big constraint of hooks is that they can only be defined in the top level of their function.
   - There's no urgent need to uplift existing code to use components, and, even if you *really* want to, you should spend some time writing new code with Hooks and make sure you and your team are comfortable with them before rewriting existing complicated components.
   - Even if two distinct effects with unrelated logic share the same dependency list, remember that one of the benefits of Hooks is their ability to organize stateful logic into cohesive modules.
     - For instance, if a component has multiple different effects that only need to fire when the component mounts and clean up when the component unmounts, don't just throw them all into one `useEffect` with an empty array as the second argument. Split those puppies up!
