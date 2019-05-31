@@ -25,16 +25,16 @@ Hooks are still new so little bugs, best practices, and support from some third 
 
 Anyway, let's meet some hooks and find out what all the fuss is about...
 
-## Meet Hooks
+
 
 Let's lay down some groundwork to make sure everyone's on the same page, and then go over some of the most useful hooks in detail.
 
-### Basics of Functional Components
+
+## Basics of Functional Components
 
 Since this talk is meant to be accessible to React beginners, I'd like to spend a few minutes talking about how functional components work in React. I won't be talking about class components because *where we're going, we don't need classes.*
 I'll also only be using arrow functions because I need to get my money's worth on deez ligatures. Also I like them.
 
-### Parts of a functional component
 ```jsx
 const definedAsFunction = ({acceptsPropObject}) => {
   doStuff();
@@ -94,12 +94,12 @@ What do you suppose will happen to the UI when the button is clicked?
     The `numba` value does indeed increment as can be seen in the browser console, but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeNumbaGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's numba value is initialized to 0.
 </details>
 
-### Some Hooks
-I won't have time to cover all 10 distinct hooks that are currently part of React's API, but I'll try to cover the one I feel are most valuable to get started with. For each one, I'll explain its purpose, how it works, and show you some common use cases. I've also found that, when working with hooks, it's incredibly valuable to know the order everything executes in. Details of this are a little lacking in the standard documentation so I'll pay special attention to helping you leave with a conceptual understanding of what exactly happens when your hooks-laden components are dancing around on the screen.
+## Meet Hooks!
+I won't have time to cover all 10 distinct hooks that are currently part of React's API, but I'll try to cover the ones I feel are most valuable to get started with. For each one, I'll explain its purpose, how it works, and show you some common use cases. I've also found that, when working with hooks, it's incredibly valuable to know the order everything executes in relative to other hooks. Details of this are a little lacking in the standard documentation so I'll pay special attention to helping you leave with a conceptual understanding of how your hooks behave relative to the render cycle and eachother.
 
 In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they *actually can* have stateful values of their own!
 
-#### `useState( )`
+### `useState( )`
 
 Easily the most important hook is the `useState` hook... which looks like this:
 
@@ -107,14 +107,16 @@ Easily the most important hook is the `useState` hook... which looks like this:
 // Highlander.js
 const Highlander = () => {
   const [howManyThereCanBe, setHowManyThereCanBe] = useState(1);
-  return <p>
-    ⚔️"THERE CAN BE ONLY ${howManyThereCanBe}!”️️⚡️
+  return <>
+    <p>
+      ⚔️"THERE CAN BE ONLY {howManyThereCanBe}!"️️⚡️
+    </p>
     <button 
       onClick={() => setHowManyThereCanBe(howManyThereCanBe + 1)}
     >
       Learn   To   Share!
     </button>
-  </p>
+  </>
 }
 ```
 
@@ -134,9 +136,9 @@ const GraduallyScreamierButton = () => {
 }
 ```
 
-Also a lot like `setState` in class components, updates to `useState` values at around the same time will be grouped together so that they're applied to the same rerender. 
+Also a lot like `setState` in class components, updates to `useState` values at around the same time will be batched together so that they're applied to the same rerender. 
 
-As an example of how `useState`'s update grouping works, consider the following bit of code:
+As an example of how `useState`'s update batching works, consider the following bit of code:
 
 ```jsx
 // GraduallyScreamierButton.js
@@ -178,9 +180,21 @@ After two clicks, our button/console looks like this:
 
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
 
+#### Behavior
+- Initial Render
+  - Stateful values initialized to arguments. Are immediately defined.
+  - Component function returns JSX built with initial state and props
+  - Render is 🚽flushed and 🎨painted
+  - `set` functions are ready to enqueue rerenders with new state
+- Subsequent Render
+  - Enqueued state changes are applied to stateful values in the order they were called.
+  - Component function returns JSX built with initial state and props
+  - Render is 🚽flushed and 🎨painted
+  - `set` functions are ready to enqueue rerenders with new state
+- Unmount
+  - Nothing really special happens. It just kind of goes away.
 
-
-#### `useEffect( )`
+### `useEffect( )`
 
 `useEffect` doesn't return anything. Its purpose is to execute imperitive side-effects in functional components: stuff like data fetching, subscriptions, manual DOM mutation, logging, etc...
 
@@ -223,7 +237,7 @@ There is another hook, `useLayoutEffect` that is identical to `useEffect` but fi
 
 It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
 
-#### `useRef( )`
+### `useRef( )`
 
 `useRef` provides a way to maintain a mutable value that persists for the lifetime of the component independent of the render cycle.
 
@@ -280,13 +294,13 @@ const TheEverlastingComponent = () => {
 
 Its most obvious use is to keep a reference to a DOM element, but it can be used to keep any value around, much in the same way that an instance variable would stick around. The value lives in the `current` property of the returned value.
 
-#### `useContext( )`
+### `useContext( )`
 
-#### `useMemo( )`
+### `useMemo( )`
 
-#### `useCallback( )`
+### `useCallback( )`
 
-#### `useReducer( )`
+### `useReducer( )`
 
 ## The order things happen in
 
@@ -349,6 +363,8 @@ One of the coolest things about Hooks is their composability and reusability. Yo
     - For instance, if a component has multiple different effects that only need to fire when the component mounts and clean up when the component unmounts, don't just throw them all into one `useEffect` with an empty array as the second argument. Split those puppies up!
 
 ## Error Handling
+
+## ❗️Don't forget to put the feedback slide in or DevCulture is going to actually send me back in time to the 80's
 
 # Re:Sources
 
