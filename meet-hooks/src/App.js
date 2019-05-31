@@ -6,6 +6,7 @@ import Thingamabob from './Examples/Example01';
 import Parent from './Examples/Example02';
 import Highlander from './Examples/Highlander'
 import GraduallyScreamierButton from './Examples/GraduallyScreamierButton'
+import ThousandsOfScreamingCats from './Examples/ThousandsOfScreamingCats'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
 import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
 import EffectUser from './Examples/Example05'
@@ -19,6 +20,7 @@ const App = () => {
         <Link to="/LifeWithoutHooks">😢</Link>
         <Link to="/Highlander">⚡️</Link>
         <Link to="/GraduallyScreamierButton">😱</Link>
+        <Link to="/ThousandsOfScreamingCats">🙀</Link>
         <Link to="/TheEverlastingComponent">🌌</Link>
         <Link to="/RealExamplesHaveCurds">🧀</Link>
         <hr />
@@ -26,6 +28,7 @@ const App = () => {
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
         <Route path="/Highlander" component={Highlander} />
         <Route path="/GraduallyScreamierButton" component={GraduallyScreamierButton} />
+        <Route path="/ThousandsOfScreamingCats" component={ThousandsOfScreamingCats} />
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
         <Route path="/RealExamplesHaveCurds" component={RealExamplesHaveCurds} />
     </Router>

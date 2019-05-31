@@ -1,7 +1,11 @@
 import React, {useState, useRef, useEffect} from 'react';
+import usePrintOnce from './usePrintOnce'
 import '../App.css';
 
+const description = `*🌌 TheEverlastingComponent*`
+
 const TheEverlastingComponent = () => {
+  usePrintOnce(description)
   const [meaninglessValue, setMeaninglessValue] = useState('💀')
   const renders = useRef(-1)
   renders.current += 1

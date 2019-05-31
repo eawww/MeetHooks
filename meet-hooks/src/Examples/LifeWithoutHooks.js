@@ -1,4 +1,5 @@
 import React from 'react';
+import usePrintOnce from './usePrintOnce'
 import '../App.css';
 
 /** Example00: Life Without Hooks
@@ -6,7 +7,10 @@ import '../App.css';
  *  mutates a variable defined in its function.
  */
 
+ const description = `*😢 LifeWithoutHooks*`
+
 const LifeWithoutHooks = () => {
+  usePrintOnce(description);
   console.log("Render")
   let numba = 0
   const makeNumbaGoUp = () => {
