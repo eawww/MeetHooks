@@ -120,14 +120,14 @@ const Highlander = () => {
 }
 ```
 
-This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that so that the set function is the name of the value prefixed with the word `set`. Array destructuring is a common pattern for using hooks.
+This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that so that the set function is the name of the value prefixed with the word `set`. Array destructuring is a common pattern for using hooks and it's handy because you can name the variables whatever you want.
 
 On the initial render, the stateful value is that of whatever is passed as an argument to `useState`. Calling the `set` function enqueues a rerender of the component replacing the stateful value with the new value. If it's the same value, the render will "bail out," meaning that it may re-render itself, but won't rerender deeper into the tree. 
 
 ❗️Reword this ya crazy
-Since calling the `set` function triggers a rerender, this means the stateful value provided by `useState` is constant for each render. The props and state of any render belong to that render and do not change. If one of those changes, you can be sure it's another render.
+Since calling the `set` function triggers a rerender, this means the stateful value provided by `useState` is constant for each render. The props and state of any render belong to that render and do not change. If one of those changes, you can be sure it's another render. It's okay if that doesn't make sense right away. I'll illustrate it with an example in a little bit.
 
-A lot like `setState`, the `set` function returned from `useState` can accept a function to update state based on previous state:
+A lot like `setState` in class components (I know I said I wouldn't mention them but lots of people think in classes.), the `set` function returned from `useState` can accept a function to update state based on previous state:
 ```jsx
 const GraduallyScreamierButton = () => {
   const [buttonText, setButtonText] = useState('AH!')
@@ -181,18 +181,22 @@ After two clicks, our button/console looks like this:
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
 
 #### Behavior
-- Initial Render
+- 👶Initial Render
   - Stateful values initialized to arguments. Are immediately defined.
   - Component function returns JSX built with initial state and props
-  - Render is 🚽flushed and 🎨painted
+  - Render is 🚽flushed
+  - Changes are 🎨painted by browser
   - `set` functions are ready to enqueue rerenders with new state
-- Subsequent Render
+- 🧑Subsequent Render
   - Enqueued state changes are applied to stateful values in the order they were called.
-  - Component function returns JSX built with initial state and props
-  - Render is 🚽flushed and 🎨painted
+  - Component function returns JSX built with new state and props
+  - Render is 🚽flushed
+  - Changes are 🎨painted by browser
   - `set` functions are ready to enqueue rerenders with new state
-- Unmount
+- 👴Unmount
   - Nothing really special happens. It just kind of goes away.
+  - Render is 🚽flushed
+  - Changes are 🎨painted by browser
 
 ### `useEffect( )`
 
@@ -236,6 +240,34 @@ I casually mentioned just now that the effect occurs *after* each render. By tha
 There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders.
 
 It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
+
+#### Behavior
+To show the sequence of things relative to what we already know about `useState`, I'm going to insert stuff for `useEffect` into the previous timeline. New stuff is in **bold**.
+- 👶🏽Initial Render
+  - Stateful values initialized to arguments. Are immediately defined.
+  - **A list of effects that need to be fired is given to React**
+  - Component function returns JSX built with initial state and props
+  - Render is 🚽flushed
+  - **Effects from `useLayoutEffect` are fired and complete.**
+  - Changes are 🎨painted by browser
+  - **Effects from `useEffect` are fired.**
+  - `set` functions are ready to enqueue rerenders with new state
+- 👩🏽Subsequent Render
+  - **React compares effect dependencies and determines which effects need to the rerun.**
+    - **Only effects with no 2nd arg or for whom at least one listed dependency has changed.**
+  - Enqueued state changes are applied to stateful values in the order they were called.
+  - Component function returns JSX built with new state and props
+  - Render is 🚽flushed
+  - **All cleanup functions from `useLayoutEffect` effects that need to be rerun are fired**
+  - **All effects from `useLayoutEffect` that need to be rerun are fired**
+  - Changes are 🎨painted by browser
+  - **All cleanup functions from `useEffect` effects that need to be rerun are fired**
+  - **All effects from `useEffect` that need to be rerun are fired**
+  - `set` functions are ready to enqueue rerenders with new state
+- 👵🏽Unmount
+  - **All cleanup functions for `useEffect` and `useLayoutEffect` are fired.**
+  - Render is 🚽flushed
+  - Changes are 🎨painted by browser
 
 ### `useRef( )`
 

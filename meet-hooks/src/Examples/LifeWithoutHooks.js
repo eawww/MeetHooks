@@ -7,7 +7,9 @@ import '../App.css';
  *  mutates a variable defined in its function.
  */
 
- const description = `*😢 LifeWithoutHooks*`
+ const description = `*😢 LifeWithoutHooks*
+ Demonstrates what happens when a functional component\
+ mutates a variable defined in its function.`
 
 const LifeWithoutHooks = () => {
   usePrintOnce(description);
