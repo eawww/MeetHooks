@@ -18,9 +18,20 @@ code {
 }
 
 button {
+  margin: 1rem;
+  padding: 0.5rem;
   font-size: 2rem;
   font-family: "LAZER84", "VCR OSD Mono";
   white-space: pre;
   background-color: black;
   color: limegreen;
+}
+
+a {
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+hr {
+  color: lime;
 }
