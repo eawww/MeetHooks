@@ -7,9 +7,7 @@
 
 > ⚠️This assumes a basic understanding of JavaScript/HTML fundamentals. Working knowledge of React is recommended but not required for the brave 👩🏽‍🚀.
 
-### History
-
-### History/Rationale
+## History/Rationale
 
 The `class` model for writing React components is a long and storied tradition. For six years, classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
 
@@ -231,24 +229,34 @@ Like `useState`, `useRef` accepts its initial value as an argument. The importan
 
 A very common use for `useRef` is to keep a reference to a DOM element around for imperative access. This is useful for, say, getting the value of an input field, but it's also a delightful escape hatch from React for when you want to make use of more imperative libraries.
 
-```jsx
-const SomeFunkyThing = () => {
-  const inputRef = useRef()
-  const wordPrisonRef = useRef()
-  const imprisonWords = () => {
+As an example, let's take a look at the fun little bonus from our Highlander example. It works very simply. It defines a ref, and gives it to a div. Then uses `useEffect` to append a highlander to our div via the `ref` on each render. Simple, right?
 
+```jsx
+const MacLeod = ({qty}) => {
+  const highlanderHolderRef = useRef()
+  // This can probably actually move out and accept node as prop. Would make example more succinct
+  const appendHighlander = () => {
+    const newImg = document.createElement('img')
+    newImg.setAttribute('class', 'MacLeod')
+    newImg.setAttribute('src', ScowlingImmortal)
+    newImg.setAttribute('style', `left: ${Math.random() * window.innerWidth}px;`)
+    highlanderHolderRef.current &&
+      highlanderHolderRef.current.appendChild(newImg);
   }
-  return <>
-    <input ref={theRef} />
-    <button>SEIZE THE TEXT!</button>
-    <div>
-      <div ref={wordPrisonRef} id="wordPrison" />
-      <div id="prisonBars" />
-    </div>
-  </>
+  useEffect(() => {
+    appendHighlander()
+  })
+  return <div
+    id="highlanderHolder"
+    ref={highlanderHolderRef}
+  />
 }
 ```
 
+But why do we have to append our highlander in a useEffect? <details>
+  <summary>Well, because...</summary> ...on the initial render, our `highlanderHolderRef` is undefined.  
+</details>
+<br><br>
 ```jsx
 const TheEverlastingComponent = () => {
   const [meaninglessValue, setMeaninglessValue] = useState('💀')
