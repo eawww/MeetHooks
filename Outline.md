@@ -349,14 +349,17 @@ const TheEverlastingComponent = () => {
 ```
 
 Its most obvious use is to keep a reference to a DOM element, but it can be used to keep any value around, much in the same way that an instance variable would stick around. The value lives in the `current` property of the returned value.
-<!-- ❗️Could show an example of this -->
+
+<!-- ❗️OMG talk about how (well also talk about useImperativeHandle) but also talk about how forwarding refs forces you to use HoC after I was babbling about not using them. 😡 -->
 
 #### Behavior
 - 👶🏽Initial Render
   - **`useState` and `useRef` values are initialized to their arguments and are immediately defined.**
+    - **`.current` value of `useRef` is mutable and persistent for the lifetime of the component**
   - A list of effects that need to be fired is given to React
   - Component function returns JSX built with initial state and props
   - Render is 🚽flushed
+  - **`.current` value of `useRef` is assigned a reference to the element it is given to**
   - Effects from `useLayoutEffect` are fired and complete.
   - Changes are 🎨painted by browser
   - Effects from `useEffect` are fired.
@@ -376,6 +379,7 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
 - 👵🏽Unmount
   - All cleanup functions for `useEffect` and `useLayoutEffect` are fired.
   - Render is 🚽flushed
+  - **`useRef` references to unmounted DOM nodes become undefined.**
   - Changes are 🎨painted by browser
 
 ### `useContext( )`
