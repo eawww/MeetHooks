@@ -9,23 +9,19 @@
 
 ## History/Rationale
 
-The `class` model for writing React components is a long and storied tradition. For six years, classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
+The `class` model for writing React components is a long and storied tradition. For four years (2015-03-10, React v0.13), classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
 
-There have been several solutions used to address the problems of classes:
-- *Mixins* offered a handy way to group related logic together and reuse it between components by basically allowing you to define related logic in a function which is then all attached to the class, but...
+There have been several solutions used to address the problems of stateful logic:
+- *Mixins*, which predate `class`es, offered a handy way to group related logic together and reuse it between components by basically allowing you to define related logic in a function which is then all defined in the scope of the component, but...
   - They had a tendency to introduce interdependent code without making it obvious how or whether it was interdependent. Everything would get all stuck together like how old spaghetti becomes a solid, unscoopable, starchy brick.
   - Related mixins sometimes couldn't even be used together if they both implemented a method with the same name.
   - They made refactoring and building upon large components the stuff of nightmares.
-  - They simply did not scale well at all. That's why their use has been actively discouraged for at least the last 3 years.
-- *Render props* and *Higher Order Components* have also been handy tools but they quickly turn a component hierarchy into what is affectionately known as *wrapper hell* [❗️Stupid fire animation on the slides plz] called so because a component hierarchies should be an easily consumable view of how an app is organized, but patterns like these make them overwhelming, unpleasant, and nearly useless... a lot like a waiter bringing you the whole pot of spaghetti with the water still in it. Pasta analogies work. 🍜
+  - They simply did not scale well at all. That's why their use has been actively discouraged for at least the last 4 years (2015-03-13).
+- With ES6 classes, came *Render props* and *Higher Order Components* with promises of composability. Higher Order Components worked and they solved a lot of the problems of mixins, via wrapping components and implementing logic via props. As this pattern became more popular, and developers began to rely on them more and more, component hierarchies began to turn into what has come to be affectionately known as *wrapper hell* [❗️Stupid fire animation on the slides plz] so called because a component hierarchy should be an easily consumable view of how an app is organized, but patterns like these make them overwhelming, unpleasant, and nearly useless... a lot like a waiter bringing you the whole pot of spaghetti where every noodle is wrapped in upwards of three additional noodles. There's nothing you can't explain with pasta analogies. 🍜
 
 The most recent and, in my opinion *best* attempt at creating cohesive, reusable statful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
 
 Hooks are still new so little bugs, best practices, and support from some third party libraries are still being worked out. Despite this, since their release, Hooks have become incredibly popular and have lived up to the hype. There's already countless blog posts, instructional videos,and talks on the subject but *this* is the only one at Cerner DevCon KC 2019. Seriously, though, there's truckloads of really smart people out there giving away knowledge for free and the official React documentation is great as well. I'll be sure to make my sources available to everyone at the end.
-
-Anyway, let's meet some hooks and find out what all the fuss is about...
-
-
 
 Let's lay down some groundwork to make sure everyone's on the same page, and then go over some of the most useful hooks in detail.
 
@@ -61,24 +57,31 @@ const definedAsFunction = ({acceptsPropObject}) => {
 
 > 👶️Important note for beginners: JSX is a templating language. Javascript expressions are used in JSX by enclosing them in `{ curly braces }`
 
-When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be flushed to the actual DOM to be painted by the browser.
+When a component is rendered or re-rendered, its function is called along with the functions for all of its child components all the way down the tree. Any and all changes that the rerender causes will be reflected in React's Virtual DOM which React will then use to decide which changes should be 🚽flushed to the actual DOM to be 🎨painted by the browser.
 
 > ❗️A diagram would be nice here.
+
+A very important thing to know going forward is that each time a component is rendered and its function is called, everything defined within the function, belongs to that function call. Each render has its own state, props, definitions, etc...
+
+<!--
+  Hooks only define how React calls your function and handles your component.
+  Hooks belong to React, your function just borrows them.  
+-->
 
 Consider the following functional component:
 ```jsx
 // LifeWithoutHooks.js
 const LifeWithoutHooks = () => {
   console.log("Render")
-  let numba = 0
-  const makeNumbaGoUp = () => {
-    numba += 1
-    console.log(`Numba was incremented to ${numba}`)
+  let theNumber = 0
+  const makeTheNumberGoUp = () => {
+    theNumber += 1
+    console.log(`theNumber was incremented to ${theNumber}`)
   }
-  return <button onClick={makeNumbaGoUp} >{numba}</button>
+  return <button onClick={makeTheNumberGoUp} >{theNumber}</button>
 }
 ```
-> This component logs "Render" when it's called, initializes a variable called `numba`, defines a function to increment `numba` and output its value, and returns a button that calls that function on click and displays the value of `numba`
+> This component logs "Render" when it's called, initializes a variable called `theNumber`, defines a function to increment `theNumber` and output its value, and returns a button that calls that function on click and displays the value of `theNumber`
 
 What do you suppose will happen to the UI when the button is clicked?
 
@@ -91,7 +94,7 @@ What do you suppose will happen to the UI when the button is clicked?
 <details>
   <summary>The answer may surprise you</summary>
     It's **C**! **C** is the answer.
-    The `numba` value does indeed increment as can be seen in the browser console, but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeNumbaGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's numba value is initialized to 0.
+    The `theNumber` value does indeed increment as can be seen in the browser console, but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeTheNumberGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's theNumber value is initialized to 0.
 </details>
 
 ## Meet Hooks!
@@ -202,42 +205,58 @@ This is because the first `setButtonText` enqueues the rerender, but the rerende
 
 `useEffect` doesn't return anything. Its purpose is to execute imperitive side-effects in functional components: stuff like data fetching, subscriptions, manual DOM mutation, logging, etc...
 
-```jsx
-const EffectUser = () => {
-  useEffect(() => {
-    console.log("I am a side-effect and I will befoul your beautiful functional code!")
-  }, [])
-  return <p>
-    DON'T LOOK AT ME!! My purpose is unrelated to my return value.
-    </p>
-}
-```
-
 `useEffect` accepts two arguments: a function that does stuff, and an array of dependencies. If you don't give it a second argument, the effect fires on every render. If you do provide an array of variables as the second argument, the effect will only run if one of those dependencies has changed on some render. If you want it to only run on the initial render, pass an empty array.
 
 The function called by `useEffect` can also return a cleanup function to be run before the effect runs again or when the component unmounts. 
 
 ```jsx
-const AlienSpacecraft = () => {
-  // 🛸
-  const [humanData, setHumanData] = useState([])
+const EffectUser = () => {
+  console.log('Render!')
+  console.log('Render!')
+  const [garbageValue, setGarbageValue] = useState('🛢')
+  const [importantValue, setImportantValue] = useState('🧐')
   useEffect(() => {
-    let abductee = tractorBeam.abductFrom('🌎', 'Some loony')
-    lights.brightness = lightModes.BLINDING
-    setHumanData(probulator.doScienceOn(abductee))
-    return () => {
-      lights.brightness = lightModes.AMBIENT_MOOD
-      tractorBeam.returnTo('🌎', abductee)
-    }
-  })
-  // ...
+    console.log(`🚀Fire the side effect! ${importantValue}`)
+    return () => console.log('🧼Clean up the side effect!')
+  }, [importantValue])
+
+  return <>
+    <div>
+      <p>{importantValue}</p>
+      <button onClick={() => setImportantValue(prev => prev + '🧐')}>More important!</button>
+    </div>
+    <div>
+      <p>{garbageValue}</p>
+      <button onClick={() => setGarbageValue(prev => prev + '🛢')}>More garbage!</button>
+    </div>
+  </>
 }
 ```
 
-In the above example, the alien spacecraft will imperitively abduct some loony from earth *after* every render and do science on them. Importantly, because of the returned callback, the alien spacecraft will return the previous loony before abducting another one. This behavior is very important to ensuring you never have two of the same subscriptions or that you undo mutations to the DOM before repeating them.
+In the above example, we define two stateful values with `useState`: `garbageValue` and `importantValue`. Our `useEffect` function logs "🚀Fire the side effect!" with the value of `importantValue` to the console and returns a cleanup function that logs "🧼Clean up the side effect!". As the second argument to the `useEffect`, we pass an array with only `importantValue` in it, telling React that important value is a dependency of the effect. The component renders `importantValue` and `garbageValue` and two buttons to add emojis to them.
+
+Now that we've met `useEffect` I'll make good on my promise to illustrate what I mean by "The props and state of any render belong to that render and do not change." Check out this example:
+
+```jsx
+const RealExamplesHaveCurds = () => {
+  const [food, setFood] = useState('🧀')
+  console.log('Render Food: ', food)
+  useEffect(() => {
+    setTimeout(() => setFood(food), 5000)
+  }, [] )
+  return <> 
+    <p>{food}</p>
+    <button onClick={() => setFood('🥕')}>🥕</button>
+  </>
+}
+```
+
+
+
+<!-- In the above example, the alien spacecraft will imperitively abduct some loony from earth *after* every render and do science on them. Importantly, because of the returned callback, the alien spacecraft will return the previous loony before abducting another one. This behavior is very important to ensuring you never have two of the same subscriptions or that you undo mutations to the DOM before repeating them. -->
 
 I casually mentioned just now that the effect occurs *after* each render. By that, I mean that React only runs an effect after its render's changes are successful, are flushed to the DOM, and those changes are painted. Importantly, it is guaranteed to fire before any subsequent renders.
-There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders.
+There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders. `useEffect` is preferred where possible so as not to block visual updates.
 
 It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
 
@@ -399,7 +418,17 @@ One of the coolest things about Hooks is their composability and reusability. Yo
 ## ❗️Don't forget to put the feedback slide in or DevCulture is going to actually send me back in time to the 80's
 
 # Re:Sources
+```js
+const emojiKey = {
+  📝: `blog post`,
+  📄: `official documentation`,
+  📺: `video`,
+  🦕: `mostly for historical value`,
+}
+```
 
+- [📝🦕Dan Abramov - Mixins are Dead, Long Live Composition](https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750)
+- [📝🦕Sophie Alpert - React v0.13](https://reactjs.org/blog/2015/03/10/react-v0.13.html) (When ES6 classes were added to react)
 - [📄React documentation](https://reactjs.org/docs/hooks-reference.html)
 - [📺 Sophie Alpert, Dan Abramov, and Ryan Florence - React Today and Tomorrow and 90% Cleaner React With Hooks (Video)](https://www.youtube.com/watch?v=dpw9EHDh2bM)
 - [📝Dan Abramov - Mixins Considered Harmful](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html)
