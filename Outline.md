@@ -94,11 +94,11 @@ What do you suppose will happen to the UI when the button is clicked?
 <details>
   <summary>The answer may surprise you</summary>
     It's **C**! **C** is the answer.
-    The `theNumber` value does indeed increment as can be seen in the browser console, but, since React calls it once for JSX to render and ignores it until the parent says it needs to rerender So makeTheNumberGoUp is called and the variable is incremented, but that variable belongs only to that function call and, therefore, only to that render. When the component does rerender, the new render's theNumber value is initialized to 0.
+    The `theNumber` value does indeed increment as can be seen in the browser console. However, since React calls the function once for JSX and ignores it until the parent says it needs to rerender, all of that incrementing is going on within the scope of the function call after React is already done with it. When the component does rerender, the new render's theNumber value is initialized to 0.
 </details>
 
 ## Meet Hooks!
-I won't have time to cover all 10 distinct hooks that are currently part of React's API, but I'll try to cover the ones I feel are most valuable to get started with. For each one, I'll explain its purpose, how it works, and show you some common use cases. I've also found that, when working with hooks, it's incredibly valuable to know the order everything executes in relative to other hooks. Details of this are a little lacking in the standard documentation so I'll pay special attention to helping you leave with a conceptual understanding of how your hooks behave relative to the render cycle and eachother.
+I won't have time to cover all 10 distinct hooks that are currently part of React's API, but I'll try to cover the ones I feel are most valuable to get started with. For each one, I'll explain its purpose, how it works, and show you some common use cases. I've also found that, when working with hooks, it's incredibly valuable to know the order everything executes in relative to other hooks. Details of this are a little lacking in the standard documentation so I'll pay special attention to helping you leave with a conceptual understanding of how your hooks behave relative to the render cycle and to eachother.
 
 In the previous example we saw exactly why functional components can't have stateful values of their own. Now we'll see exactly how they *actually can* have stateful values of their own!
 
@@ -117,20 +117,24 @@ const Highlander = () => {
     <button 
       onClick={() => setHowManyThereCanBe(howManyThereCanBe + 1)}
     >
-      Learn   To   Share!
+      Learn To Share!
     </button>
   </>
 }
 ```
 
-This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing as seen so that so that the set function is the name of the value prefixed with the word `set`. Array destructuring is a common pattern for using hooks and it's handy because you can name the variables whatever you want.
+This hook defines a stateful value and a function for setting that value, returned in a pair. Convention is to assign these via array destructuturing, as seen, so that so that the `set` function is the name of the value prefixed with the word `set` in camelCase. Array destructuring is a common pattern for using hooks which is handy because it allows you to easily name the variables whatever you want.
 
 On the initial render, the stateful value is that of whatever is passed as an argument to `useState`. Calling the `set` function enqueues a rerender of the component replacing the stateful value with the new value. If it's the same value, the render will "bail out," meaning that it may re-render itself, but won't rerender deeper into the tree. 
 
 ❗️Reword this ya crazy
-Since calling the `set` function triggers a rerender, this means the stateful value provided by `useState` is constant for each render. The props and state of any render belong to that render and do not change. If one of those changes, you can be sure it's another render. It's okay if that doesn't make sense right away. I'll illustrate it with an example in a little bit.
+Since calling the `set` function triggers a rerender, the stateful value provided by `useState` is also constant for each render. The props and state of any render belong to that render and do not change. I'll illustrate this more with another example in a little bit.
 
-A lot like `setState` in class components (I know I said I wouldn't mention them but lots of people think in classes.), the `set` function returned from `useState` can accept a function to update state based on previous state:
+A lot like `setState` in class components (I know I said I wouldn't mention them but lots of people think in classes), the `set` function returned from `useState` can accept a function to update state based on previous state:
+
+<!-- If there's room, this example could mimick the below example but update state
+  directly from the state (setButtonText(`A${buttonText}`)) to show why that's a bad idea.-->
+
 ```jsx
 const GraduallyScreamierButton = () => {
   const [buttonText, setButtonText] = useState('AH!')
@@ -184,19 +188,19 @@ After two clicks, our button/console looks like this:
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
 
 #### Behavior
-- 👶Initial Render
-  - Stateful values initialized to arguments. Are immediately defined.
+- 👶🏾Initial Render
+  - `useState` values are initialized to their arguments and are immediately defined.
   - Component function returns JSX built with initial state and props
   - Render is 🚽flushed
   - Changes are 🎨painted by browser
   - `set` functions are ready to enqueue rerenders with new state
-- 🧑Subsequent Render
+- 🧑🏾Subsequent Render
   - Enqueued state changes are applied to stateful values in the order they were called.
   - Component function returns JSX built with new state and props
   - Render is 🚽flushed
   - Changes are 🎨painted by browser
   - `set` functions are ready to enqueue rerenders with new state
-- 👴Unmount
+- 👴🏾Unmount
   - Nothing really special happens. It just kind of goes away.
   - Render is 🚽flushed
   - Changes are 🎨painted by browser
@@ -263,7 +267,7 @@ It's strongly advised that your array of dependencies contains every variable fr
 #### Behavior
 To show the sequence of things relative to what we already know about `useState`, I'm going to insert stuff for `useEffect` into the previous timeline. New stuff is in **bold**.
 - 👶🏽Initial Render
-  - Stateful values initialized to arguments. Are immediately defined.
+  - `useState` values are initialized to their arguments and are immediately defined.
   - **A list of effects that need to be fired is given to React**
   - Component function returns JSX built with initial state and props
   - Render is 🚽flushed
@@ -292,11 +296,11 @@ To show the sequence of things relative to what we already know about `useState`
 
 `useRef` provides a way to maintain a mutable value that persists for the lifetime of the component independent of the render cycle.
 
-Like `useState`, `useRef` accepts its initial value as an argument. The important difference it, after that moment, it lives independently of the render cycle and maintains a mutable value in its `.current` property for the entire life of the component.
+Like `useState`, `useRef` accepts its initial value as an argument. The important difference is, after that moment, it lives independently of the render cycle and maintains a mutable value in its `.current` property for the entire life of the component.
 
 A very common use for `useRef` is to keep a reference to a DOM element around for imperative access. This is useful for, say, getting the value of an input field, but it's also a delightful escape hatch from React for when you want to make use of more imperative libraries.
 
-As an example, let's take a look at the fun little bonus from our Highlander example. It works very simply. It defines a ref, and gives it to a div. Then uses `useEffect` to append a highlander to our div via the `ref` on each render. Simple, right?
+As an example, let's take a look at the fun little bonus from our Highlander example. It works very simply. It defines a `ref`, and gives it to a div. Then uses `useEffect` to append a highlander to our div via the `ref` on each render. Simple, right?
 
 ```jsx
 const MacLeod = ({qty}) => {
@@ -307,8 +311,7 @@ const MacLeod = ({qty}) => {
     newImg.setAttribute('class', 'MacLeod')
     newImg.setAttribute('src', ScowlingImmortal)
     newImg.setAttribute('style', `left: ${Math.random() * window.innerWidth}px;`)
-    highlanderHolderRef.current &&
-      highlanderHolderRef.current.appendChild(newImg);
+    highlanderHolderRef.current.appendChild(newImg);
   }
   useEffect(() => {
     appendHighlander()
@@ -320,10 +323,12 @@ const MacLeod = ({qty}) => {
 }
 ```
 
-But why do we have to append our highlander in a useEffect? <details>
-  <summary>Well, because...</summary> ...on the initial render, our `highlanderHolderRef` is undefined. So when we try to call `appendChild( )` on it, it all comes crashing down.
+But why do we have to append our highlander in a useEffect?
+<details>
+  <summary>Well, because...</summary> ...on the initial render, our `highlanderHolderRef` is undefined. So when we try to call `appendChild( )` on it, it all comes crashing down. `useEffect` waits for the div to be 🚽flushed and 🎨painted before appending the child to it. The element has to exist before we can have a reference to it.
 </details>
 <br><br>
+
 ```jsx
 const TheEverlastingComponent = () => {
   const [meaninglessValue, setMeaninglessValue] = useState('💀')
@@ -344,6 +349,34 @@ const TheEverlastingComponent = () => {
 ```
 
 Its most obvious use is to keep a reference to a DOM element, but it can be used to keep any value around, much in the same way that an instance variable would stick around. The value lives in the `current` property of the returned value.
+<!-- ❗️Could show an example of this -->
+
+#### Behavior
+- 👶🏽Initial Render
+  - **`useState` and `useRef` values are initialized to their arguments and are immediately defined.**
+  - A list of effects that need to be fired is given to React
+  - Component function returns JSX built with initial state and props
+  - Render is 🚽flushed
+  - Effects from `useLayoutEffect` are fired and complete.
+  - Changes are 🎨painted by browser
+  - Effects from `useEffect` are fired.
+  - `set` functions are ready to enqueue rerenders with new state
+- 👩🏽Subsequent Render
+  - React compares effect dependencies and determines which effects need to the rerun.
+    - Only effects with no 2nd arg or for whom at least one listed dependency has changed.
+  - Enqueued state changes are applied to stateful values in the order they were called.
+  - Component function returns JSX built with new state and props
+  - Render is 🚽flushed
+  - All cleanup functions from `useLayoutEffect` effects that need to be rerun are fired
+  - All effects from `useLayoutEffect` that need to be rerun are fired
+  - Changes are 🎨painted by browser
+  - All cleanup functions from `useEffect` effects that need to be rerun are fired
+  - All effects from `useEffect` that need to be rerun are fired
+  - `set` functions are ready to enqueue rerenders with new state
+- 👵🏽Unmount
+  - All cleanup functions for `useEffect` and `useLayoutEffect` are fired.
+  - Render is 🚽flushed
+  - Changes are 🎨painted by browser
 
 ### `useContext( )`
 
