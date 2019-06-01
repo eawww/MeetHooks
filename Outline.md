@@ -353,7 +353,7 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
 <!-- ❗️OMG talk about how (well also talk about useImperativeHandle) but also talk about how forwarding refs forces you to use HoC after I was babbling about not using them. 😡 -->
 
 #### Behavior
-- 👶🏽Initial Render
+- 👶Initial Render
   - **`useState` and `useRef` values are initialized to their arguments and are immediately defined.**
     - **`.current` value of `useRef` is mutable and persistent for the lifetime of the component**
   - A list of effects that need to be fired is given to React
@@ -364,7 +364,7 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
   - Changes are 🎨painted by browser
   - Effects from `useEffect` are fired.
   - `set` functions are ready to enqueue rerenders with new state
-- 👩🏽Subsequent Render
+- 👩‍Subsequent Render
   - React compares effect dependencies and determines which effects need to the rerun.
     - Only effects with no 2nd arg or for whom at least one listed dependency has changed.
   - Enqueued state changes are applied to stateful values in the order they were called.
@@ -376,7 +376,7 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
   - All cleanup functions from `useEffect` effects that need to be rerun are fired
   - All effects from `useEffect` that need to be rerun are fired
   - `set` functions are ready to enqueue rerenders with new state
-- 👵🏽Unmount
+- 👴Unmount
   - All cleanup functions for `useEffect` and `useLayoutEffect` are fired.
   - Render is 🚽flushed
   - **`useRef` references to unmounted DOM nodes become undefined.**
