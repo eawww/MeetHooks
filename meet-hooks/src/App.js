@@ -9,7 +9,7 @@ import GraduallyScreamierButton from './Examples/GraduallyScreamierButton'
 import ThousandsOfScreamingCats from './Examples/ThousandsOfScreamingCats'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
 import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
-import EffectUser from './Examples/Example05'
+import EffectUser from './Examples/EffectUser'
 import EffectUser2 from './Examples/Example06'
 
 import './App.css';
@@ -17,9 +17,11 @@ import './App.css';
 const App = () => {
   return (
     <Router>
+        <Link to="/">🏚</Link>
         <Link to="/LifeWithoutHooks">😢</Link>
         <Link to="/Highlander">⚡️</Link>
         <Link to="/GraduallyScreamierButton">😱</Link>
+        <Link to="/EffectUser">🛢</Link>
         <Link to="/ThousandsOfScreamingCats">🙀</Link>
         <Link to="/TheEverlastingComponent">🌌</Link>
         <Link to="/RealExamplesHaveCurds">🧀</Link>
@@ -28,6 +30,7 @@ const App = () => {
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
         <Route path="/Highlander" component={Highlander} />
         <Route path="/GraduallyScreamierButton" component={GraduallyScreamierButton} />
+        <Route path="/EffectUser" component={EffectUser} />
         <Route path="/ThousandsOfScreamingCats" component={ThousandsOfScreamingCats} />
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
         <Route path="/RealExamplesHaveCurds" component={RealExamplesHaveCurds} />
