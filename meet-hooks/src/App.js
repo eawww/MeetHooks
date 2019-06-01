@@ -9,6 +9,7 @@ import GraduallyScreamierButton from './Examples/GraduallyScreamierButton'
 import ThousandsOfScreamingCats from './Examples/ThousandsOfScreamingCats'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
 import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
+import MessingWithTheRef from './Examples/MessingWithTheRef'
 import EffectUser from './Examples/EffectUser'
 import EffectUser2 from './Examples/Example06'
 
@@ -25,6 +26,7 @@ const App = () => {
         <Link to="/ThousandsOfScreamingCats">🙀</Link>
         <Link to="/TheEverlastingComponent">🌌</Link>
         <Link to="/RealExamplesHaveCurds">🧀</Link>
+        <Link to="/MessingWithTheRef">🏈</Link>
         <hr />
         <Route exact path="/" component={null} />
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
@@ -34,6 +36,7 @@ const App = () => {
         <Route path="/ThousandsOfScreamingCats" component={ThousandsOfScreamingCats} />
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
         <Route path="/RealExamplesHaveCurds" component={RealExamplesHaveCurds} />
+        <Route path="/MessingWithTheRef" component={MessingWithTheRef} />
     </Router>
   );
 }

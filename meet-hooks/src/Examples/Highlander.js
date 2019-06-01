@@ -15,7 +15,7 @@ const Highlander = () => {
     <button 
       onClick={() => setHowManyThereCanBe(howManyThereCanBe + 1)}
     >
-      Learn   To   Share!
+      Learn To Share!
     </button>
     <SecretComponent qty={howManyThereCanBe} />
   </>

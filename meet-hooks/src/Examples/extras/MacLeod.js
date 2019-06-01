@@ -8,9 +8,8 @@ const MacLeod = ({qty}) => {
     const newImg = document.createElement('img')
     newImg.setAttribute('class', 'MacLeod')
     newImg.setAttribute('src', ScowlingImmortal)
-    newImg.setAttribute('style', `left: ${Math.random() * window.innerWidth}px;`)
-    highlanderHolderRef.current &&
-      highlanderHolderRef.current.appendChild(newImg);
+    newImg.setAttribute('style', `left: ${(Math.random() - 0.05) * window.innerWidth}px;`)
+    highlanderHolderRef.current.appendChild(newImg);
   }
   useEffect(() => {
     appendHighlander()
