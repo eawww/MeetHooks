@@ -9,7 +9,7 @@
 
 ## History/Rationale
 
-The `class` model for writing React components is a long and storied tradition. For four years (2015-03-10, React v0.13), classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
+The `class` model for writing React components is a long and storied tradition. For four years (0.2 score) (2015-03-10, React v0.13), classes have been the de facto solution for implementing stateful logic within components but they can quickly become large and confusing when related code has to be spread across multiple lifecycle methods, each with bits and pieces of unrelated logic within them. By themselves, classes have created a marvelous way for us to cook up big ol' bowls of spaghetti code, which sounds delicious... but it's not when you're the one who has to eat it. 🍝
 
 There have been several solutions used to address the problems of stateful logic:
 - *Mixins*, which predate `class`es, offered a handy way to group related logic together and reuse it between components by basically allowing you to define related logic in a function which is then all defined in the scope of the component, but...
@@ -19,7 +19,7 @@ There have been several solutions used to address the problems of stateful logic
   - They simply did not scale well at all. That's why their use has been actively discouraged for at least the last 4 years (2015-03-13).
 - With ES6 classes, came *Render props* and *Higher Order Components* with promises of composability. Higher Order Components worked and they solved a lot of the problems of mixins, via wrapping components and implementing logic via props. As this pattern became more popular, and developers began to rely on them more and more, component hierarchies began to turn into what has come to be affectionately known as *wrapper hell* [❗️Stupid fire animation on the slides plz] so called because a component hierarchy should be an easily consumable view of how an app is organized, but patterns like these make them overwhelming, unpleasant, and nearly useless... a lot like a waiter bringing you the whole pot of spaghetti where every noodle is wrapped in upwards of three additional noodles. There's nothing you can't explain with pasta analogies. 🍜
 
-The most recent and, in my opinion *best* attempt at creating cohesive, reusable statful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
+The most recent and, in my opinion *best* attempt at creating cohesive, reusable stateful logic in React is the new *Hooks API*. Hooks were initially proposed in an [RFC](https://github.com/reactjs/rfcs/pull/68) on October 25th, 2018 <!--Use absolute years like a decent human being, even in the talk--> and announced at React Conf 2018 the same day in [back-to-back talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) by Sophie Alpert, Dan Abramov, and Ryan Florence. After months of enthusiastic feedback from developers, and hard work by contributors, exactly 3 months ago (prior to when this talk was given), Hooks became an official part of React on Feb 6, 2019 in React [16.8.0](https://github.com/facebook/react/releases/tag/v16.8.0).
 
 Hooks are still new so little bugs, best practices, and support from some third party libraries are still being worked out. Despite this, since their release, Hooks have become incredibly popular and have lived up to the hype. There's already countless blog posts, instructional videos,and talks on the subject but *this* is the only one at Cerner DevCon KC 2019. Seriously, though, there's truckloads of really smart people out there giving away knowledge for free and the official React documentation is great as well. I'll be sure to make my sources available to everyone at the end.
 
@@ -68,7 +68,7 @@ A very important thing to know going forward is that each time a component is re
   Hooks belong to React, your function just borrows them.  
 -->
 
-Consider the following functional component:
+To illustrate this, consider the following functional component:
 ```jsx
 // LifeWithoutHooks.js
 const LifeWithoutHooks = () => {
@@ -150,9 +150,9 @@ As an example of how `useState`'s update batching works, consider the following 
 ```jsx
 // GraduallyScreamierButton.js
 const GraduallyScreamierButton = () => {
+  console.log('RENDER!')
   const [buttonText, setButtonText] = useState('AH!')
   const getScreamier = () => {
-    console.log('RENDER!')
     setButtonText(prev => `A${prev}`)
     setButtonText(prev => `E${prev}`)
   }
@@ -162,20 +162,27 @@ const GraduallyScreamierButton = () => {
 
 We define a stateful value, `buttonText` with `useState` to keep track of a text string. We define a function that logs "RENDER!" to the console and then calls `setButtonText` twice in a row: The first time prepending an 'A' to `buttonText`, the second time prepending an 'E' to `buttonText`. The component returns a button element that calls our function on each click.
 
-Since `setButtonText` enqueues a rerender each time it's called, and it's called twice in a row appending a different value to the beginning of the previous value, which of the following behaviors would you expect?
+Since `setButtonText` enqueues a rerender each time it's called, and it's called twice in a row appending a different value to the beginning of the previous value, which of the following behaviors would you expect when the button is clicked twice?
 
-**A.** Button says **"AEAEAH!"** and logs "RENDER!" **twice per click**
-**B.** Button says **"EAEAAH!"** and logs "RENDER!" **twice per click**
-**C.** Button says **"EEEEAH!"** and logs "RENDER!" **twice per click**
-**D.** Button says **"AAAAAH!"** and logs "RENDER!" **once per click**
-**E.** Button says **"EAEAAH!"** and logs "RENDER!" **once per click**
-**F.** Button says **"AEAEAH!"** and logs "RENDER!" **once per click**
+**Button will say:**
+A. **"AEAEAH!"**
+B. **"EAEAAH!"**
+C. **"AAAH!"**
+D. **"EEAH!"**
+E. **"AH!EE"**
+F. **"AEAH!"**
+
+**Render will print:**
+A. 1 time
+B. 2 times
+C. 3 times
+D. 4 times
 
 > ❗️This would be a nice place for an audience survey if I can get that to work
 
 <details>
   <summary>Answer here!</summary>
-  If you guessed **C**, you are the furthest from the right answer... which is **E**. The resulting scream will start with E and render once per click.
+  If you guessed **E** and **D**, you are the furthest from the right answer... which is **B** and **B**. The resulting scream will start with E and render once per click.
 </details>
 
 Here's proof and why:
@@ -186,7 +193,7 @@ Here's proof and why:
 After two clicks, our button/console looks like this:
 
 This is because the first `setButtonText` enqueues the rerender, but the rerender isn't instantaneous and JavaScript continues execution on this instance of the component. So when the second `setButtonText` enqueues a rerender to prepend an 'E' to our scream, it does so after the 'A' is prepended but on the same subsequent render.
-
+👋🏾✌🏾
 #### Behavior
 - 👶🏾Initial Render
   - `useState` values are initialized to their arguments and are immediately defined.
@@ -365,10 +372,11 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
   - Effects from `useEffect` are fired.
   - `set` functions are ready to enqueue rerenders with new state
 - 👩‍Subsequent Render
-  - React compares effect dependencies and determines which effects need to the rerun.
-    - Only effects with no 2nd arg or for whom at least one listed dependency has changed.
   - Enqueued state changes are applied to stateful values in the order they were called.
   - Component function returns JSX built with new state and props
+  - React compares effect dependencies and determines which effects need to the rerun.
+    - Only effects with no 2nd arg or for whom at least one listed dependency has changed.
+    - It has to compare after the function is called to account for dependencies that are derived from props/state.
   - Render is 🚽flushed
   - All cleanup functions from `useLayoutEffect` effects that need to be rerun are fired
   - All effects from `useLayoutEffect` that need to be rerun are fired
@@ -383,6 +391,10 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
   - Changes are 🎨painted by browser
 
 ### `useContext( )`
+
+A little over a year ago (2018-03-29, v16.3.0), React released its officially supported Context API that allowed a sort of global state for a all children of a component. This was done using Higher Order Components: Context.Provider around the parent, and Context.Consumer around whichever of its descendents needed to consume that context. This made it possible to keep state high in the hierarchy, which is generally considered a good thing, without needing to pass it as props down through layers of components that didn't need it.
+
+The Hooks API gives us an even handier way to consume context in the form of `useContext`. Sadly, for now, context `provider`s are still implemented using HOC, but they're typically much less numerous than `consumers` so this is still a big win.
 
 ### `useMemo( )`
 
