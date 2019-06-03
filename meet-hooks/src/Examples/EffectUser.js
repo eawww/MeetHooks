@@ -5,7 +5,7 @@ const EffectUser = () => {
   console.log('Render!')
   const [garbageValue, setGarbageValue] = useState('🛢')
   const [importantValue, setImportantValue] = useState('🧐')
-  
+
   useEffect(() => {
     console.log(`🚀Fire the side effect!`)
     return () => console.log('🧼Clean up the side effect!')

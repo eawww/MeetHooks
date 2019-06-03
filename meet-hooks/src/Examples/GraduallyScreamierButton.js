@@ -5,17 +5,13 @@ import '../App.css';
 const description = `*😱 GraduallyScreamierButton*`
 
 const GraduallyScreamierButton = () => {
+  console.log('RENDER!')
   usePrintOnce(description);
-  const [screamoji, setScreamoji] = useState('😱')
-  // if(screamoji === '😱') setScreamoji('🙀')
-  // console.log(screamoji)
-  const [buttonText, setButtonText] = useState('AH!' + screamoji)
+  const [buttonText, setButtonText] = useState('AH!')
   const getScreamier = () => {
-    console.log('RENDER!')
     setButtonText(prev => `A${prev}`)
     setButtonText(prev => `E${prev}`)
   }
-  // return <>{screamoji}<button onClick={getScreamier}>{buttonText}</button></>
   return <button onClick={getScreamier}>{buttonText}</button>
 }
 
