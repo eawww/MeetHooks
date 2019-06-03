@@ -1,8 +1,8 @@
-import {useRef} from 'react';
+import {useEffect} from 'react';
 
 /** Immediately prints to console as info whatever is passed*/
 const usePrintOnce = (description) => {
-  useRef(console.info(description))
+  useEffect(() => console.info(description), [])
 }
 
 export default usePrintOnce
