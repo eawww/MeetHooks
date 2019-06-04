@@ -214,6 +214,8 @@ This is because the first `setButtonText` enqueues the rerender, but the rerende
 
 ### `useEffect( )`
 
+Now that you're aquainted with `useState`, you just *have* to meet it's best friend, `useEffect`.
+
 `useEffect` doesn't return anything. Its purpose is to execute imperitive side-effects in functional components: stuff like data fetching, subscriptions, manual DOM mutation, logging, etc...
 
 `useEffect` accepts two arguments: a function that does stuff, and an array of dependencies. If you don't give it a second argument, the effect fires on every render. If you do provide an array of variables as the second argument, the effect will only run if one of those dependencies has changed on some render. If you want it to only run on the initial render, pass an empty array.
@@ -222,7 +224,6 @@ The function called by `useEffect` can also return a cleanup function to be run 
 
 ```jsx
 const EffectUser = () => {
-  console.log('Render!')
   console.log('Render!')
   const [garbageValue, setGarbageValue] = useState('🛢')
   const [importantValue, setImportantValue] = useState('🧐')
@@ -262,14 +263,8 @@ const RealExamplesHaveCurds = () => {
 }
 ```
 
-
-
-<!-- In the above example, the alien spacecraft will imperitively abduct some loony from earth *after* every render and do science on them. Importantly, because of the returned callback, the alien spacecraft will return the previous loony before abducting another one. This behavior is very important to ensuring you never have two of the same subscriptions or that you undo mutations to the DOM before repeating them. -->
-
 I casually mentioned just now that the effect occurs *after* each render. By that, I mean that React only runs an effect after its render's changes are successful, are flushed to the DOM, and those changes are painted. Importantly, it is guaranteed to fire before any subsequent renders.
 There is another hook, `useLayoutEffect` that is identical to `useEffect` but fires synchronously after DOM changes and prevents the browser from painting until it's complete. This is useful for side-effects that affect the UI to avoid messy rerenders. `useEffect` is preferred where possible so as not to block visual updates.
-
-It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
 
 #### Behavior
 To show the sequence of things relative to what we already know about `useState`, I'm going to insert stuff for `useEffect` into the previous timeline. New stuff is in **bold**.
@@ -312,16 +307,9 @@ As an example, let's take a look at the fun little bonus from our Highlander exa
 ```jsx
 const MacLeod = ({qty}) => {
   const highlanderHolderRef = useRef()
-  // This can probably actually move out and accept node as prop. Would make example more succinct
-  const appendHighlander = () => {
-    const newImg = document.createElement('img')
-    newImg.setAttribute('class', 'MacLeod')
-    newImg.setAttribute('src', ScowlingImmortal)
-    newImg.setAttribute('style', `left: ${Math.random() * window.innerWidth}px;`)
-    highlanderHolderRef.current.appendChild(newImg);
-  }
+  
   useEffect(() => {
-    appendHighlander()
+    appendHighlander(highlanderHolderRef)
   })
   return <div
     id="highlanderHolder"
@@ -392,9 +380,79 @@ Its most obvious use is to keep a reference to a DOM element, but it can be used
 
 ### `useContext( )`
 
-A little over a year ago (2018-03-29, v16.3.0), React released its officially supported Context API that allowed a sort of global state for a all children of a component. This was done using Higher Order Components: Context.Provider around the parent, and Context.Consumer around whichever of its descendents needed to consume that context. This made it possible to keep state high in the hierarchy, which is generally considered a good thing, without needing to pass it as props down through layers of components that didn't need it.
+A little over a year ago (2018-03-29, v16.3.0), React released its officially supported Context API that allowed a sort of global state for a all children of a component. This was done using Higher Order Components: Context.Provider around the parent, and Context.Consumer around whichever of its descendents needed to consume that context. This made it possible to keep state high in the hierarchy, which is generally considered a good thing, without needing to pass it as props down through layers of components that didn't need it. It looks like this:
 
 The Hooks API gives us an even handier way to consume context in the form of `useContext`. Sadly, for now, context `provider`s are still implemented using HOC, but they're typically much less numerous than `consumers` so this is still a big win.
+
+It looks like this:
+```jsx
+const WhenIGetThatFeeling = () => {
+  const need = useContext(ContextualHealing)
+  return <div>{need}</div>
+}
+```
+> "`ThatFeeling`", of course, is that you spend too much effort passing props waaaay down your hierarchy.
+
+To show you how this works, I've cooked up a couple little examples:
+
+```jsx
+const WhenIGetThatFeeling = ({need}) => {
+  return <div>{need}</div>
+}
+
+const WrapperPurgatory = ({value}) => 
+  <div className="borderDiv">
+    <WhenIGetThatFeeling need={value}/>
+  </div>
+
+const TopmostContext = () => {
+  const [value, setValue] = useState('')
+  return <>
+    <input onChange={e => setValue(e.target.value)} value={value} />
+    <WrapperPurgatory value={value} />
+  </>
+}
+```
+
+Let's start from the bottom:
+  - `TopMostContext` hold a state value, which is set by an input field and passed as a prop to `WrapperPurgatory`
+  - `WrapperPurgatory` isn’t as bad as wrapper hell but does enough to make us pass our value through a component that doesn’t need it. This is to save space. Please imagine hundreds of layers of components.
+  - `WhenIGetThatFeeling` simply shows the value in a div.
+
+This works but it’s inconvenient and it’s a pattern that becomes burdensome in larger apps. That's where `useContext` comes in.
+
+```jsx
+import ContextualHealing from './MarvinContext'
+
+const WhenIGetThatFeeling = () => {
+  const need = useContext(ContextualHealing)
+  return <div>{need}</div>
+}
+
+const WrapperPurgatory = () => 
+  <div className="borderDiv">
+    <div className="borderDiv">
+      <WhenIGetThatFeeling />
+    </div>
+  </div>
+
+const TopmostContext = () => {
+  const [value, setValue] = useState('')
+  return <ContextualHealing.Provider value={value}>
+    <input onChange={e => setValue(e.target.value)} value={value} />
+    <WrapperPurgatory />
+  </ContextualHealing.Provider>
+}
+```
+
+If we use React’s context API, we can skip over `WrapperPurgatory` entirely!  I’m importing it just to show how it’s shared between components in separate files, but `MarvinContext.js` only contains two lines and we could have just as easily defined it here:
+
+```js
+import React from 'react'
+export default React.createContext()
+```
+
+We’ve made a few changes in this version. Obviously, we’ve eliminated prop drilling, but we’ve also wrapped our topmost component in the `Provider` for our context. In `WhenIGetThatFeeling`, we’ve defined our `need` value with the useContext hook. I’ve also added another div to WrapperPurgatory for dramatic effect. Let’s check the demo just for fun.
 
 ### `useMemo( )`
 
@@ -402,35 +460,8 @@ The Hooks API gives us an even handier way to consume context in the form of `us
 
 ### `useReducer( )`
 
-## The order things happen in
-
-1. Initial Render
-    1. React calls the function 
-    1. `useState` Stateful values initialized to values passed as arguments.
-    1. Component function returns JSX to React along with a list of effects that need to be fired.
-    1. React updates the Virtual DOM, then 🚽 flushes necessary changes to the DOM.
-    1. Effects from `useLayoutEffect` are fired and complete.
-    1. 🎨 Browser Paints changes to the DOM
-    1. Effects from `useEffect` are fired.
-1. Subsequent Render (a stateful value is set with its `set` function or a change to props)
-    1. React compares effect dependencies and determines which effects need to the rerun.
-    1. React calls the function with updated props and state.
-    1. Component function returns JSX to React along with a list of effects that need to be fired.
-    1. React updates the Virtual DOM, then 🚽 flushes necessary changes to the DOM.
-    1. Cleanup functions from `useLayoutEffect` that need to be rerun are fired synchronously.
-    1. Effects from `useLayoutEffect` that need to be rerun are fired synchronously.
-    1. 🎨 Browser Paints changes to the DOM
-    1. Cleanup functions from `useEffect` that need to be rerun are fired synchronously.
-    1. Effects from `useEffect` that need to be rerun are fired synchronously.
-1. Unmount, once it is decided that the child must die. An interesting thing happens:
-    1. React updates Virtual DOM
-    1. All cleanup functions are called in the order that they're defined. 
-        - (This is how it goes. I don't know if it's important that it does or if it's just an implementation coincidence)
-    1. 🚽 Flushes necessary changes to the DOM.
-    1. 🎨 Browser Paints changes to the DOM
-
-![Browser performance graph of event sequnce of functional component unmounting](./images/Example06a.png)
-> 🖼This graph shows the child component in Example06 unmounting after `onClick` event (leftmost pink). The four effect cleanup functions can be seen running in the middle followed by the respective node being removed from the DOM. The layout and paint operations are in purple and green on the rightmost side.
+<!-- ![Browser performance graph of event sequnce of functional component unmounting](./images/Example06a.png)
+> 🖼This graph shows the child component in Example06 unmounting after `onClick` event (leftmost pink). The four effect cleanup functions can be seen running in the middle followed by the respective node being removed from the DOM. The layout and paint operations are in purple and green on the rightmost side. -->
 
 ## Making Your Own Reusable Hooks
 
@@ -448,12 +479,12 @@ One of the coolest things about Hooks is their composability and reusability. Yo
   - Reliance on HOCs can lead to "wrapper hell" which makes your component hierarchy tedious and unwieldy.
 
 ## Benefits
+- Allows easy, scalable reuse of stateful logic between components.
+- No more bulky, confusing classes.
 - Full backward compatibility
   - While Hooks are recommended for future develpoment in React, there are no plans to discontinue support for class-based components.
   - Once your probject is on React >=16.8.0, you can begin writing new components using Hooks and they'll get along just fine with your existing class-based components.
     - *Note: Hooks cannot be used in class based components so a rewrite of a single component can't be done gradually*
-
-## Testing
 
 ## Rules and Best Practices
 
@@ -461,6 +492,7 @@ One of the coolest things about Hooks is their composability and reusability. Yo
   - There's no urgent need to uplift existing code to use components, and, even if you *really* want to, you should spend some time writing new code with Hooks and make sure you and your team are comfortable with them before rewriting existing complicated components.
   - Even if two distinct effects with unrelated logic share the same dependency list, remember that one of the benefits of Hooks is their ability to organize stateful logic into cohesive modules.
     - For instance, if a component has multiple different effects that only need to fire when the component mounts and clean up when the component unmounts, don't just throw them all into one `useEffect` with an empty array as the second argument. Split those puppies up!
+  - It's strongly advised that your array of dependencies contains every variable from your component that is used by your effect (stateful values, props, etc.). This does not include variables defined inside your effect. 
 
 ## Error Handling
 
