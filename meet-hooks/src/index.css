@@ -51,7 +51,7 @@ hr {
 .MacLeod {
   animation: rise 0.5s forwards;
   position: absolute;
-  width: 10%;
+  width: 20%;
 }
 
 @keyframes rise {
@@ -66,4 +66,9 @@ hr {
 .inlineDiv {
   display: inline;
   width: min-content;
+}
+
+.borderDiv {
+  border: thick double #32a1ce;
+  padding: 1rem;
 }

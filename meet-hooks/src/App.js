@@ -10,6 +10,7 @@ import ThousandsOfScreamingCats from './Examples/ThousandsOfScreamingCats'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
 import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
 import MessingWithTheRef from './Examples/MessingWithTheRef'
+import ContextualHealing from './Examples/ContextualHealing'
 import EffectUser from './Examples/EffectUser'
 import EffectUser2 from './Examples/Example06'
 
@@ -27,6 +28,7 @@ const App = () => {
         <Link to="/TheEverlastingComponent">🌌</Link>
         <Link to="/RealExamplesHaveCurds">🧀</Link>
         <Link to="/MessingWithTheRef">🏈</Link>
+        <Link to="/ContextualHealing">👨🏻‍⚕️</Link>
         <hr />
         <Route exact path="/" component={null} />
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
@@ -37,6 +39,7 @@ const App = () => {
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
         <Route path="/RealExamplesHaveCurds" component={RealExamplesHaveCurds} />
         <Route path="/MessingWithTheRef" component={MessingWithTheRef} />
+        <Route path="/ContextualHealing" component={ContextualHealing} />
     </Router>
   );
 }
