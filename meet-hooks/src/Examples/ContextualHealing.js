@@ -22,3 +22,5 @@ const TopmostContext = () => {
     <WrapperPurgatory />
   </ContextualHealing.Provider>
 }
+
+export default TopmostContext
