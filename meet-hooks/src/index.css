@@ -1,0 +1,74 @@
+body {
+  margin: 1rem;
+  font-size: 2rem;
+  font-family: "VCR OSD Mono", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(#000c57 0%, #c116c0 100%);
+  height: 100vh;
+  color: white;
+  text-align: center;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+  monospace;
+}
+
+button, input {
+  margin: 1rem;
+  letter-spacing: 0.2em;
+  padding: 0.5rem;
+  font-size: 2rem;
+  font-family: "LAZER84", "VCR OSD Mono";
+  white-space: pre;
+  background-color: black;
+  color: limegreen;
+}
+
+a {
+  text-decoration: none;
+  margin-right: 1rem;
+}
+
+hr {
+  color: lime;
+}
+
+#highlanderHolder {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  text-align: left;
+  overflow: hidden;
+}
+
+.MacLeod {
+  animation: rise 0.5s forwards;
+  position: absolute;
+  width: 20%;
+}
+
+@keyframes rise {
+  0% {
+    bottom: -20%;
+  }
+  100% {
+    bottom: 0;
+  }
+}
+
+.inlineDiv {
+  display: inline;
+  width: min-content;
+}
+
+.borderDiv {
+  border: thick double #32a1ce;
+  padding: 1rem;
+}
