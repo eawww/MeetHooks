@@ -14,12 +14,12 @@ import '../App.css';
 const LifeWithoutHooks = () => {
   usePrintOnce(description);
   console.log("Render")
-  let numba = 0
+  let theNumber = 0
   const makeNumbaGoUp = () => {
-    numba += 1
-    console.log(`Numba was incremented to ${numba}`)
+    theNumber += 1
+    console.log(`TheNumber was incremented to ${theNumber}`)
   }
-  return <button onClick={makeNumbaGoUp} >{numba}</button>
+  return <button onClick={makeNumbaGoUp} >{theNumber}</button>
 }
 
 /** This only exists as an easy way to rerender the child

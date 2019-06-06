@@ -6,6 +6,7 @@ import Thingamabob from './Examples/Example01';
 import Parent from './Examples/Example02';
 import Highlander from './Examples/Highlander'
 import GraduallyScreamierButton from './Examples/GraduallyScreamierButton'
+import CheekyMonkey from './Examples/CheekyMonkey'
 import ThousandsOfScreamingCats from './Examples/ThousandsOfScreamingCats'
 import TheEverlastingComponent from './Examples/TheEverlastingComponent' 
 import RealExamplesHaveCurds from './Examples/RealExamplesHaveCurds'
@@ -23,17 +24,19 @@ const App = () => {
         <Link to="/LifeWithoutHooks">😢</Link>
         <Link to="/Highlander">⚡️</Link>
         <Link to="/GraduallyScreamierButton">😱</Link>
+        {/* <Link to="/CheekyMonkey">🐒</Link> */}
         <Link to="/EffectUser">🛢</Link>
-        <Link to="/ThousandsOfScreamingCats">🙀</Link>
-        <Link to="/TheEverlastingComponent">🌌</Link>
+        {/* <Link to="/ThousandsOfScreamingCats">🙀</Link> */}
+        {/* <Link to="/TheEverlastingComponent">🌌</Link> */}
         <Link to="/RealExamplesHaveCurds">🧀</Link>
-        <Link to="/MessingWithTheRef">🏈</Link>
+        {/* <Link to="/MessingWithTheRef">🏈</Link> */}
         <Link to="/ContextualHealing">👨🏻‍⚕️</Link>
         <hr />
         <Route exact path="/" component={null} />
         <Route path="/LifeWithoutHooks" component={LifeWithoutHooks} />
         <Route path="/Highlander" component={Highlander} />
         <Route path="/GraduallyScreamierButton" component={GraduallyScreamierButton} />
+        <Route path="/CheekyMonkey" component={CheekyMonkey} />
         <Route path="/EffectUser" component={EffectUser} />
         <Route path="/ThousandsOfScreamingCats" component={ThousandsOfScreamingCats} />
         <Route path="/TheEverlastingComponent" component={TheEverlastingComponent} />
